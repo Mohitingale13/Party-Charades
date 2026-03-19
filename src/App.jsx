@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Settings, Ban, FolderOpen, Crown, LayoutGrid, PenSquare, Play, RotateCcw, Check, X, Sparkles, Loader2, ArrowUp } from 'lucide-react';
+import { Ban, FolderOpen, Crown, LayoutGrid, PenSquare, Play, RotateCcw, Check, X, Sparkles, Loader2, ArrowUp, ArrowDown, HelpCircle, Smartphone } from 'lucide-react';
 
 // --- DICTIONARIES ---
 const WORD_LISTS = {
@@ -76,7 +76,7 @@ const DECKS = [
 ];
 
 export default function App() {
-  const [gameState, setGameState] = useState('home'); // home, setup, waiting-forehead, countdown, playing, results, create
+  const [gameState, setGameState] = useState('home'); // home, setup, waiting-forehead, countdown, playing, results, create, tutorial
   const [selectedDeck, setSelectedDeck] = useState(null);
   const [timeLimit, setTimeLimit] = useState(60);
   const [playMode, setPlayMode] = useState('standard'); // 'standard' or 'single'
@@ -85,10 +85,11 @@ export default function App() {
   const [timeLeft, setTimeLeft] = useState(0);
   const [currentWords, setCurrentWords] = useState([]);
   const [currentWord, setCurrentWord] = useState('');
+  const [correctWords, setCorrectWords] = useState([]); // Track exactly what was guessed
   const [score, setScore] = useState(0);
   const [cardStatus, setCardStatus] = useState('neutral'); // neutral, correct, pass
   const [isCooldown, setIsCooldown] = useState(false);
-  const [infoMessage, setInfoMessage] = useState(''); // Added for popup modal
+  const [infoMessage, setInfoMessage] = useState(''); 
   
   // AI Custom Decks State
   const [customDecks, setCustomDecks] = useState([]);
@@ -98,13 +99,20 @@ export default function App() {
 
   const timerRef = useRef(null);
   
-  // Refs to fix gyro multi-triggering and overlapping intervals
+  // Refs to fix gyro multi-triggering, swing delays, and state closures
   const isCooldownRef = useRef(false); 
   const hasStartedCountdownRef = useRef(false);
   const gyroActiveRef = useRef(false); 
+  const foreheadLockRef = useRef(false); // Prevents fast triggering while swinging phone up
+  const currentWordRef = useRef(''); // Allows event listener to know the current word
 
   // Detect touch capability for hiding/showing desktop tap zones
   const isTouchDevice = typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0);
+
+  // --- KEEP REF UPDATED FOR GYRO LISTENER ---
+  useEffect(() => {
+    currentWordRef.current = currentWord;
+  }, [currentWord]);
 
   // --- FULLSCREEN LOGIC ---
   const enterFullscreen = () => {
@@ -131,8 +139,8 @@ export default function App() {
   // --- FOREHEAD DETECTION ---
   useEffect(() => {
     const handleForeheadDetection = (event) => {
-      // Prevent multiple triggers by checking the lock
-      if (gameState !== 'waiting-forehead' || hasStartedCountdownRef.current) return;
+      // Prevent multiple triggers or triggering while the arm is swinging up (foreheadLockRef)
+      if (gameState !== 'waiting-forehead' || hasStartedCountdownRef.current || foreheadLockRef.current) return;
       
       const tilt = event.gamma || 0;
       const beta = event.beta || 0;
@@ -233,6 +241,12 @@ export default function App() {
     // Attempt to make the browser go fullscreen
     enterFullscreen();
     hasStartedCountdownRef.current = false; // Reset the countdown lock
+    
+    // Lock the forehead detection for 1.5 seconds so swinging the arm doesn't trigger it
+    foreheadLockRef.current = true;
+    setTimeout(() => {
+        foreheadLockRef.current = false;
+    }, 1500);
 
     if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
       DeviceOrientationEvent.requestPermission()
@@ -307,12 +321,13 @@ export default function App() {
     if (timerRef.current) clearInterval(timerRef.current);
     hasStartedCountdownRef.current = true;
 
-    // Prepare words (checking both hardcoded and AI generated lists)
+    // Prepare words & reset tracking
     const currentDeckWords = WORD_LISTS[selectedDeck.id] || customWordLists[selectedDeck.id];
     let shuffled = [...currentDeckWords].sort(() => Math.random() - 0.5);
     setCurrentWords(shuffled);
     setCurrentWord(shuffled[0]);
     setScore(0);
+    setCorrectWords([]); // Clear previously guessed words
     setGameState('countdown');
     setTimeLeft(3); // Quick 3 second countdown after placing on forehead
 
@@ -364,6 +379,8 @@ export default function App() {
     
     if (isCorrect) {
       setScore(s => s + 1);
+      // Track the correct word directly from the ref to avoid stale state closures
+      setCorrectWords(prev => [...prev, currentWordRef.current]);
     }
 
     // Vibrate if supported
@@ -432,9 +449,9 @@ export default function App() {
       <div className="flex gap-3">
         <div 
           className="bg-white rounded-full p-1.5 cursor-pointer active:scale-95 transition-transform"
-          onClick={() => setInfoMessage('Settings feature coming soon!')}
+          onClick={() => setGameState('tutorial')}
         >
-          <Settings className="text-[#5c5cce] w-5 h-5" />
+          <HelpCircle className="text-[#5c5cce] w-5 h-5" />
         </div>
       </div>
       <div 
@@ -473,6 +490,55 @@ export default function App() {
   );
 
   // --- RENDER SCREENS ---
+
+  if (gameState === 'tutorial') {
+    return (
+      <div className="flex flex-col h-screen w-full bg-[#f0f2f5] font-sans overflow-hidden relative p-6 items-center justify-center">
+         <div className="bg-white rounded-3xl p-8 w-full max-w-sm shadow-xl flex flex-col items-center animate-in fade-in zoom-in duration-300 relative">
+            
+            <button 
+              onClick={() => setGameState('home')}
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 bg-slate-100 rounded-full p-1"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <h2 className="text-3xl font-black text-[#1e2338] mb-8 uppercase tracking-wide">How to Play</h2>
+            
+            <div className="flex items-start gap-5 mb-6 w-full">
+               <div className="bg-indigo-100 p-3 rounded-full shrink-0 shadow-sm"><Smartphone className="w-7 h-7 text-indigo-600" /></div>
+               <div>
+                  <h4 className="font-black text-slate-800 text-lg mb-1">1. Place on Forehead</h4>
+                  <p className="text-sm text-slate-500 font-medium leading-relaxed">Hold the phone against your forehead facing your friends so they can see the word.</p>
+               </div>
+            </div>
+
+            <div className="flex items-start gap-5 mb-6 w-full">
+               <div className="bg-green-100 p-3 rounded-full shrink-0 shadow-sm"><ArrowDown className="w-7 h-7 text-green-600" /></div>
+               <div>
+                  <h4 className="font-black text-slate-800 text-lg mb-1">2. Tilt DOWN = Correct</h4>
+                  <p className="text-sm text-slate-500 font-medium leading-relaxed">When your friends help you guess the word correctly, tilt the phone downwards.</p>
+               </div>
+            </div>
+
+            <div className="flex items-start gap-5 mb-10 w-full">
+               <div className="bg-red-100 p-3 rounded-full shrink-0 shadow-sm"><ArrowUp className="w-7 h-7 text-red-600" /></div>
+               <div>
+                  <h4 className="font-black text-slate-800 text-lg mb-1">3. Tilt UP = Pass</h4>
+                  <p className="text-sm text-slate-500 font-medium leading-relaxed">If you're stuck and can't guess it, tilt the phone upwards to pass to the next word.</p>
+               </div>
+            </div>
+
+            <button 
+              onClick={() => setGameState('home')}
+              className="w-full bg-[#5c5cce] text-white font-bold text-xl py-4 rounded-2xl shadow-[0_6px_0_#4343a3] active:translate-y-1.5 active:shadow-none transition-all flex items-center justify-center gap-2"
+            >
+              <Check className="w-6 h-6" /> Got it! Let's Play
+            </button>
+         </div>
+      </div>
+    );
+  }
 
   if (gameState === 'home') {
     return (
@@ -521,9 +587,9 @@ export default function App() {
           <div className="absolute inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm px-4">
             <div className="bg-white p-6 rounded-3xl shadow-xl flex flex-col items-center max-w-xs w-full">
               <div className="bg-amber-100 p-3 rounded-full mb-4">
-                <Settings className="text-amber-500 w-8 h-8 animate-spin-slow" />
+                <FolderOpen className="text-amber-500 w-8 h-8 animate-pulse" />
               </div>
-              <h3 className="text-xl font-black text-slate-800 mb-2">Coming Soon!</h3>
+              <h3 className="text-xl font-black text-slate-800 mb-2">Message</h3>
               <p className="text-slate-500 mb-6 text-center font-medium">{infoMessage}</p>
               <button 
                 onClick={() => setInfoMessage('')}
@@ -724,19 +790,36 @@ export default function App() {
     return (
       <div className="flex flex-col h-screen w-full bg-[#f0f2f5] font-sans items-center justify-center p-6 text-center">
         <h2 className="text-4xl font-black text-[#1e2338] mb-2 uppercase">Time's Up!</h2>
-        <p className="text-slate-500 font-bold mb-8">Category: {selectedDeck.title} {playMode === 'single' ? '(Single Mode)' : ''}</p>
+        <p className="text-slate-500 font-bold mb-6">Category: {selectedDeck.title} {playMode === 'single' ? '(Single Mode)' : ''}</p>
 
-        <div className="bg-white p-8 rounded-3xl shadow-lg w-full max-w-sm mb-12 flex flex-col items-center">
-           <div className="text-6xl mb-4">🏆</div>
-           <p className="text-slate-500 font-bold uppercase tracking-wider text-sm mb-2">Final Score</p>
-           <h1 className="text-8xl font-black text-[#5c5cce] mb-6">{score}</h1>
-           <div className="w-full bg-slate-100 rounded-full h-4 overflow-hidden">
+        <div className="bg-white p-6 rounded-3xl shadow-lg w-full max-w-sm mb-10 flex flex-col items-center">
+           <div className="text-6xl mb-2">🏆</div>
+           <p className="text-slate-500 font-bold uppercase tracking-wider text-sm mb-1">Final Score</p>
+           <h1 className="text-7xl font-black text-[#5c5cce] mb-4">{score}</h1>
+           <div className="w-full bg-slate-100 rounded-full h-3 overflow-hidden mb-4">
               <div 
                 className="bg-[#5c5cce] h-full" 
                 style={{ width: playMode === 'single' ? (score > 0 ? '100%' : '0%') : `${Math.min(100, (score / 15) * 100)}%` }}
               ></div>
            </div>
-           <p className="text-xs text-slate-400 mt-3 font-semibold">Great job! Keep practicing.</p>
+           
+           {/* Summary of Correct Words */}
+           {correctWords.length > 0 && (
+             <div className="w-full mt-2 border-t border-slate-100 pt-4 flex flex-col items-center">
+                <p className="text-slate-400 font-bold uppercase tracking-wider text-xs mb-3">Words Guessed Correctly</p>
+                <div className="flex flex-wrap gap-2 justify-center max-h-32 overflow-y-auto w-full p-1 custom-scrollbar">
+                   {correctWords.map((word, i) => (
+                     <span key={i} className="bg-green-100 text-green-700 px-3 py-1.5 rounded-full text-sm font-bold border border-green-200 shadow-sm">
+                       {word}
+                     </span>
+                   ))}
+                </div>
+             </div>
+           )}
+
+           {correctWords.length === 0 && (
+             <p className="text-xs text-slate-400 font-semibold mt-2">Better luck next time! Keep practicing.</p>
+           )}
         </div>
 
         <div className="flex gap-4 w-full max-w-sm">
@@ -816,7 +899,7 @@ export default function App() {
           <div className="absolute inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm px-4">
             <div className="bg-white p-6 rounded-3xl shadow-xl flex flex-col items-center max-w-xs w-full">
               <div className="bg-amber-100 p-3 rounded-full mb-4">
-                <Settings className="text-amber-500 w-8 h-8 animate-spin-slow" />
+                <FolderOpen className="text-amber-500 w-8 h-8 animate-pulse" />
               </div>
               <h3 className="text-xl font-black text-slate-800 mb-2">Message</h3>
               <p className="text-slate-500 mb-6 text-center font-medium">{infoMessage}</p>
