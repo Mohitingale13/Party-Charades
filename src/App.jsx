@@ -48,6 +48,19 @@ const WORD_LISTS = {
     "Roll No 21", "Little Krishna", "Bal Hanuman", "Spider-Man", "Batman",
     "Power Rangers", "Mr. Maker", "Bob the Builder", "Thomas the Tank Engine",
     "Teletubbies", "Pink Panther", "Popeye", "Donald Duck", "Snow White"
+  ],
+  songs: [
+    "Tum Hi Ho", "Chaiyya Chaiyya", "Kal Ho Naa Ho", "Kabira", "Pehla Nasha", 
+    "Tujh Mein Rab Dikhta Hai", "Channa Mereya", "Desi Girl", "Kajra Re", "Jai Ho", 
+    "Lungi Dance", "Munni Badnaam Hui", "Senorita", "Gerua", "Dil Diyan Gallan", 
+    "Aankh Marey", "Apna Time Aayega", "Kar Gayi Chull", "Kala Chashma", "Ghungroo",
+    "Jhoome Jo Pathaan", "Kesariya", "Raabta", "Balam Pichkari", "Tum Se Hi"
+  ],
+  fruits: [
+    "Apple", "Banana", "Mango", "Orange", "Grapes", "Watermelon", "Pineapple", 
+    "Strawberry", "Papaya", "Guava", "Pomegranate", "Kiwi", "Cherry", "Pear", 
+    "Plum", "Peach", "Lychee", "Dragonfruit", "Coconut", "Fig", "Muskmelon", 
+    "Blackberry", "Blueberry", "Avocado", "Sweet Lime"
   ]
 };
 
@@ -56,14 +69,17 @@ const DECKS = [
   { id: 'food', title: 'Food', icon: '🍔', color: 'bg-amber-500' },
   { id: 'animals', title: 'Animals', icon: '🦁', color: 'bg-teal-400' },
   { id: 'movies', title: 'Hindi Movies', icon: '🎬', color: 'bg-blue-400' },
+  { id: 'songs', title: 'Hindi Songs', icon: '🎵', color: 'bg-pink-500' },
   { id: 'objects', title: 'Objects', icon: '🖍️', color: 'bg-purple-500' },
-  { id: 'disney', title: 'Cartoons', icon: '🐭', color: 'bg-amber-400' }
+  { id: 'disney', title: 'Cartoons', icon: '🐭', color: 'bg-amber-400' },
+  { id: 'fruits', title: 'Fruits', icon: '🍎', color: 'bg-red-400' }
 ];
 
 export default function App() {
   const [gameState, setGameState] = useState('home'); // home, setup, waiting-forehead, countdown, playing, results, create
   const [selectedDeck, setSelectedDeck] = useState(null);
   const [timeLimit, setTimeLimit] = useState(60);
+  const [playMode, setPlayMode] = useState('standard'); // 'standard' or 'single'
   
   // Game Play State
   const [timeLeft, setTimeLeft] = useState(0);
@@ -344,6 +360,12 @@ export default function App() {
   };
 
   const proceedToNextWord = () => {
+    // If we are in Single Movie Mode, the round ends immediately after one guess/pass
+    if (playMode === 'single') {
+        setTimeout(() => setGameState('results'), 100);
+        return;
+    }
+
     setCurrentWords(prev => {
       const nextWords = [...prev.slice(1)];
       if (nextWords.length > 0) {
@@ -444,6 +466,7 @@ export default function App() {
               <div 
                 key={deck.id}
                 onClick={() => {
+                  setPlayMode('standard'); // Default to standard mode when opening a deck
                   setSelectedDeck(deck);
                   setGameState('setup');
                 }}
@@ -505,16 +528,45 @@ export default function App() {
         <div className={`${selectedDeck.color} w-32 h-32 rounded-2xl flex items-center justify-center text-6xl shadow-lg mb-6`}>
           {selectedDeck.icon}
         </div>
-        <h2 className="text-3xl font-black text-slate-800 mb-8">{selectedDeck.title}</h2>
+        <h2 className="text-3xl font-black text-slate-800 mb-6">{selectedDeck.title}</h2>
         
-        <div className="bg-white p-6 rounded-2xl shadow-sm w-full max-w-sm mb-8">
-          <label className="block text-slate-600 font-bold mb-4 text-center">Round Duration (Seconds)</label>
-          <div className="flex items-center justify-between bg-slate-100 rounded-xl p-2">
-            <button onClick={() => setTimeLimit(Math.max(10, timeLimit - 10))} className="p-3 bg-white rounded-lg shadow-sm text-slate-800 font-bold">-</button>
-            <span className="text-2xl font-black text-[#5c5cce]">{timeLimit}s</span>
-            <button onClick={() => setTimeLimit(Math.min(300, timeLimit + 10))} className="p-3 bg-white rounded-lg shadow-sm text-slate-800 font-bold">+</button>
+        {/* Toggle Mode Options (Only visible for Movies) */}
+        {selectedDeck.id === 'movies' && (
+          <div className="bg-white p-2 rounded-2xl shadow-sm w-full max-w-sm mb-4 flex gap-2">
+            <button 
+              onClick={() => { setPlayMode('standard'); setTimeLimit(60); }}
+              className={`flex-1 py-3 rounded-xl font-bold transition-colors ${playMode === 'standard' ? 'bg-[#5c5cce] text-white' : 'bg-transparent text-slate-500 hover:bg-slate-50'}`}
+            >
+              Standard
+            </button>
+            <button 
+              onClick={() => { setPlayMode('single'); setTimeLimit(90); }}
+              className={`flex-1 py-3 rounded-xl font-bold transition-colors ${playMode === 'single' ? 'bg-[#5c5cce] text-white' : 'bg-transparent text-slate-500 hover:bg-slate-50'}`}
+            >
+              1 Movie (90s)
+            </button>
           </div>
-        </div>
+        )}
+
+        {/* Time Limit Controls - Only show in Standard Mode */}
+        {playMode === 'standard' && (
+          <div className="bg-white p-6 rounded-2xl shadow-sm w-full max-w-sm mb-8 animate-in fade-in zoom-in duration-300">
+            <label className="block text-slate-600 font-bold mb-4 text-center">Round Duration (Seconds)</label>
+            <div className="flex items-center justify-between bg-slate-100 rounded-xl p-2">
+              <button onClick={() => setTimeLimit(Math.max(10, timeLimit - 10))} className="p-3 bg-white rounded-lg shadow-sm text-slate-800 font-bold">-</button>
+              <span className="text-2xl font-black text-[#5c5cce]">{timeLimit}s</span>
+              <button onClick={() => setTimeLimit(Math.min(300, timeLimit + 10))} className="p-3 bg-white rounded-lg shadow-sm text-slate-800 font-bold">+</button>
+            </div>
+          </div>
+        )}
+
+        {/* Static Time Limit Info - Only show in Single Mode */}
+        {playMode === 'single' && (
+          <div className="bg-white p-6 rounded-2xl shadow-sm w-full max-w-sm mb-8 animate-in fade-in zoom-in duration-300 flex flex-col items-center">
+            <div className="text-slate-500 font-bold text-center mb-2">You have 90 seconds to guess exactly</div>
+            <div className="text-2xl font-black text-[#5c5cce]">1 MOVIE</div>
+          </div>
+        )}
 
         <button 
           onClick={requestSensorAccessAndPlay}
@@ -646,7 +698,7 @@ export default function App() {
     return (
       <div className="flex flex-col h-screen w-full bg-[#f0f2f5] font-sans items-center justify-center p-6 text-center">
         <h2 className="text-4xl font-black text-[#1e2338] mb-2 uppercase">Time's Up!</h2>
-        <p className="text-slate-500 font-bold mb-8">Category: {selectedDeck.title}</p>
+        <p className="text-slate-500 font-bold mb-8">Category: {selectedDeck.title} {playMode === 'single' ? '(Single Mode)' : ''}</p>
 
         <div className="bg-white p-8 rounded-3xl shadow-lg w-full max-w-sm mb-12 flex flex-col items-center">
            <div className="text-6xl mb-4">🏆</div>
@@ -655,7 +707,7 @@ export default function App() {
            <div className="w-full bg-slate-100 rounded-full h-4 overflow-hidden">
               <div 
                 className="bg-[#5c5cce] h-full" 
-                style={{ width: `${Math.min(100, (score / 15) * 100)}%` }}
+                style={{ width: playMode === 'single' ? (score > 0 ? '100%' : '0%') : `${Math.min(100, (score / 15) * 100)}%` }}
               ></div>
            </div>
            <p className="text-xs text-slate-400 mt-3 font-semibold">Great job! Keep practicing.</p>
