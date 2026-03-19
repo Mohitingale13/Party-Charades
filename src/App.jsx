@@ -130,7 +130,7 @@ export default function App() {
     return () => window.removeEventListener('deviceorientation', handleForeheadDetection);
   }, [gameState]);
   
-  // --- GYROSCOPE HANDLING ---
+  // --- PERFECTLY BALANCED GYROSCOPE HANDLING ---
   useEffect(() => {
     const handleOrientation = (event) => {
       if (gameState !== 'playing') return;
@@ -138,40 +138,56 @@ export default function App() {
       const tilt = event.gamma || 0; 
       const beta = event.beta || 0;
       
-      const absTilt = Math.abs(tilt);
-      const absBeta = Math.abs(beta);
-
-      // 1. Check if phone is in NEUTRAL position (Upright on Forehead)
-      // Works for both Portrait-Locked and Auto-Rotated Landscape OS states
-      const isNeutral = absTilt > 50 || (absBeta > 50 && absBeta < 130);
-
-      let isTiltingDown = false; // Correct (Screen to floor)
-      let isTiltingUp = false;   // Pass (Screen to ceiling)
-
-      // 2. Check if phone is in FLAT position
-      if (absTilt < 40) {
-        // Fallback detection for OS orientation to fix axis flipping
-        const isLandscapeOS = window.innerWidth > window.innerHeight;
-        
-        if (isLandscapeOS) {
-          // Compensated / Auto-rotated landscape
-          if (beta > 130 || beta < -130) isTiltingDown = true; // Floor
-          else if (absBeta < 40) isTiltingUp = true;           // Ceiling
-        } else {
-          // Uncompensated / Portrait lock
-          if (absBeta < 40) isTiltingDown = true;              // Floor
-          else if (beta > 130 || beta < -130) isTiltingUp = true; // Ceiling
-        }
+      // Determine if the OS has auto-rotated the browser window
+      let isLandscapeOS = false;
+      if (typeof window.orientation !== 'undefined') {
+          isLandscapeOS = Math.abs(window.orientation) === 90;
+      } else if (window.innerWidth > window.innerHeight) {
+          isLandscapeOS = true;
       }
 
-      // 3. Apply the Logic
+      let isNeutral = false;
+      let isTiltingDown = false; // Correct (Face to Floor)
+      let isTiltingUp = false;   // Pass (Face to Ceiling)
+
+      if (isLandscapeOS) {
+          // If the OS rotated natively, 'beta' handles the up/down pitch.
+          // Neutral on forehead means beta is near 90 or -90.
+          const absBeta = Math.abs(beta);
+          
+          // Symmetric 40-degree thresholds from 90 (Neutral)
+          isNeutral = absBeta > 50 && absBeta < 130;
+          isTiltingUp = absBeta <= 50;    // Tilting face up towards ceiling
+          isTiltingDown = absBeta >= 130; // Tilting face down towards floor
+      } else {
+          // If the phone is portrait-locked but held sideways.
+          const absGamma = Math.abs(tilt);
+          const absBeta = Math.abs(beta);
+
+          // Neutral: Gamma is near 90/-90 (phone standing on its long edge)
+          // We set the threshold precisely at 45 degrees.
+          isNeutral = absGamma > 45;
+
+          if (!isNeutral) {
+              // The phone has crossed the 45-degree mark (it is flat-ish).
+              // We check beta to see if the screen is facing the floor or ceiling.
+              if (absBeta > 90) {
+                  isTiltingDown = true; // Face down (Floor)
+              } else {
+                  isTiltingUp = true;   // Face up (Ceiling)
+              }
+          }
+      }
+
+      // --- APPLY GAME LOGIC ---
       if (isCooldownRef.current) {
-        // Wait for phone to return to forehead to show next word
+        // We are currently showing Correct (Green) or Pass (Red).
+        // Wait strictly for the phone to return to the neutral forehead position.
         if (isNeutral) {
           proceedToNextWord();
         }
       } else {
-        // Ready for a new answer
+        // We are waiting for an answer.
         if (isTiltingDown) {
           handleAnswer(true, false);
         } else if (isTiltingUp) {
@@ -352,8 +368,8 @@ export default function App() {
   // --- UI COMPONENTS ---
 
   // Forces Portrait screens into Landscape physically using CSS
-  const LandscapeWrapper = ({ children, bgColor = "bg-[#5c5cce]" }) => (
-    <div className={`fixed inset-0 ${bgColor} overflow-hidden z-50 transition-colors duration-300`}>
+  const LandscapeWrapper = ({ children, bgClass = "bg-[#5c5cce]" }) => (
+    <div className={`fixed inset-0 ${bgClass} overflow-hidden z-50 transition-colors duration-300`}>
       <div 
         className="absolute top-0 left-0 flex items-center justify-between w-[100vh] h-[100vw]"
         style={{ 
@@ -540,7 +556,7 @@ export default function App() {
 
   if (gameState === 'countdown') {
     return (
-      <LandscapeWrapper bgColor={selectedDeck.color}>
+      <LandscapeWrapper bgClass={selectedDeck.color}>
         <div className="flex-1 flex items-center justify-center w-full h-full">
           <div className="text-[25vh] font-black text-white drop-shadow-xl">{timeLeft}</div>
         </div>
@@ -549,12 +565,13 @@ export default function App() {
   }
 
   if (gameState === 'playing') {
-    let bgColor = '#5c5cce'; // Default purple matching reference
-    if (cardStatus === 'correct') bgColor = '#22c55e'; // Green
-    if (cardStatus === 'pass') bgColor = '#ef4444'; // Red
+    // Explicit, hardcoded Tailwind class names guarantee compilation.
+    let currentBgClass = 'bg-[#5c5cce]'; // Default purple
+    if (cardStatus === 'correct') currentBgClass = 'bg-green-500'; // Green
+    if (cardStatus === 'pass') currentBgClass = 'bg-red-500'; // Red
 
     return (
-      <LandscapeWrapper bgColor={`bg-[${bgColor}]`}>
+      <LandscapeWrapper bgClass={currentBgClass}>
         {/* Back Button (Top Right) */}
         <button 
           onClick={quitGame}
