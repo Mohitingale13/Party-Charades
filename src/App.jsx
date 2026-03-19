@@ -97,7 +97,11 @@ export default function App() {
   const [isGenerating, setIsGenerating] = useState(false);
 
   const timerRef = useRef(null);
-  const isCooldownRef = useRef(false); // Using ref to prevent stale closure in event listener
+  
+  // Refs to fix gyro multi-triggering and overlapping intervals
+  const isCooldownRef = useRef(false); 
+  const hasStartedCountdownRef = useRef(false);
+  const gyroActiveRef = useRef(false); 
 
   // Detect touch capability for hiding/showing desktop tap zones
   const isTouchDevice = typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0);
@@ -127,7 +131,8 @@ export default function App() {
   // --- FOREHEAD DETECTION ---
   useEffect(() => {
     const handleForeheadDetection = (event) => {
-      if (gameState !== 'waiting-forehead') return;
+      // Prevent multiple triggers by checking the lock
+      if (gameState !== 'waiting-forehead' || hasStartedCountdownRef.current) return;
       
       const tilt = event.gamma || 0;
       const beta = event.beta || 0;
@@ -136,6 +141,7 @@ export default function App() {
       
       // Neutral position (upright on forehead)
       if (absTilt > 50 || (absBeta > 50 && absBeta < 130)) {
+        hasStartedCountdownRef.current = true; // Lock the trigger immediately
         startCountdown();
       }
     };
@@ -149,7 +155,8 @@ export default function App() {
   // --- PERFECTLY BALANCED GYROSCOPE HANDLING ---
   useEffect(() => {
     const handleOrientation = (event) => {
-      if (gameState !== 'playing') return;
+      // Check if we are in playing state AND the 1-second grace period is over
+      if (gameState !== 'playing' || !gyroActiveRef.current) return;
 
       const tilt = event.gamma || 0; 
       const beta = event.beta || 0;
@@ -225,6 +232,7 @@ export default function App() {
   const requestSensorAccessAndPlay = () => {
     // Attempt to make the browser go fullscreen
     enterFullscreen();
+    hasStartedCountdownRef.current = false; // Reset the countdown lock
 
     if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
       DeviceOrientationEvent.requestPermission()
@@ -295,6 +303,10 @@ export default function App() {
   };
 
   const startCountdown = () => {
+    // Clear any existing intervals to prevent overlap glitches
+    if (timerRef.current) clearInterval(timerRef.current);
+    hasStartedCountdownRef.current = true;
+
     // Prepare words (checking both hardcoded and AI generated lists)
     const currentDeckWords = WORD_LISTS[selectedDeck.id] || customWordLists[selectedDeck.id];
     let shuffled = [...currentDeckWords].sort(() => Math.random() - 0.5);
@@ -317,11 +329,19 @@ export default function App() {
   };
 
   const startGame = () => {
+    if (timerRef.current) clearInterval(timerRef.current);
+
     setGameState('playing');
     setTimeLeft(timeLimit);
     setCardStatus('neutral');
     setIsCooldown(false);
     isCooldownRef.current = false;
+    
+    // 1-Second Grace Period: Disable gyro tracking briefly so the player can stabilize the phone
+    gyroActiveRef.current = false;
+    setTimeout(() => {
+        gyroActiveRef.current = true;
+    }, 1000);
 
     timerRef.current = setInterval(() => {
       setTimeLeft((prev) => {
@@ -372,7 +392,10 @@ export default function App() {
         setCurrentWord(nextWords[0]);
       } else {
         setCurrentWord("OUT OF WORDS!");
-        setTimeout(() => setGameState('results'), 1000);
+        setTimeout(() => {
+           clearInterval(timerRef.current);
+           setGameState('results');
+        }, 1000);
       }
       return nextWords;
     });
@@ -593,7 +616,10 @@ export default function App() {
         </button>
         <div 
           className="flex-1 flex items-center justify-center h-full w-full px-8 cursor-pointer"
-          onClick={startCountdown} 
+          onClick={() => {
+              hasStartedCountdownRef.current = true;
+              startCountdown();
+          }} 
         >
           <h1 className="text-5xl md:text-7xl font-bold text-white text-center leading-snug tracking-wide">
             Place phone on forehead<br/>and continue
