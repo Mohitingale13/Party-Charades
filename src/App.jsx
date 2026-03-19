@@ -112,10 +112,14 @@ export default function App() {
   useEffect(() => {
     const handleForeheadDetection = (event) => {
       if (gameState !== 'waiting-forehead') return;
-      // When user lifts phone to forehead (landscape), gamma or beta will shift significantly
+      
       const tilt = event.gamma || 0;
       const beta = event.beta || 0;
-      if (Math.abs(tilt) > 60 || Math.abs(beta) > 60) {
+      const absTilt = Math.abs(tilt);
+      const absBeta = Math.abs(beta);
+      
+      // Neutral position (upright on forehead)
+      if (absTilt > 50 || (absBeta > 50 && absBeta < 130)) {
         startCountdown();
       }
     };
@@ -131,19 +135,38 @@ export default function App() {
     const handleOrientation = (event) => {
       if (gameState !== 'playing') return;
 
-      // In landscape mode, Gamma usually represents forward/backward tilt
       const tilt = event.gamma || 0; 
       const beta = event.beta || 0;
-
-      // Depending on phone rotation and OS, either beta or gamma tracks the "nod"
-      const isTiltingDown = tilt > 45 || beta > 45; 
-      const isTiltingUp = tilt < -45 || beta < -45;
       
-      // Neutral position (phone placed flat against forehead again)
-      const isNeutral = Math.abs(tilt) < 25 && Math.abs(beta) < 25;
+      const absTilt = Math.abs(tilt);
+      const absBeta = Math.abs(beta);
 
+      // 1. Check if phone is in NEUTRAL position (Upright on Forehead)
+      // Works for both Portrait-Locked and Auto-Rotated Landscape OS states
+      const isNeutral = absTilt > 50 || (absBeta > 50 && absBeta < 130);
+
+      let isTiltingDown = false; // Correct (Screen to floor)
+      let isTiltingUp = false;   // Pass (Screen to ceiling)
+
+      // 2. Check if phone is in FLAT position
+      if (absTilt < 40) {
+        // Fallback detection for OS orientation to fix axis flipping
+        const isLandscapeOS = window.innerWidth > window.innerHeight;
+        
+        if (isLandscapeOS) {
+          // Compensated / Auto-rotated landscape
+          if (beta > 130 || beta < -130) isTiltingDown = true; // Floor
+          else if (absBeta < 40) isTiltingUp = true;           // Ceiling
+        } else {
+          // Uncompensated / Portrait lock
+          if (absBeta < 40) isTiltingDown = true;              // Floor
+          else if (beta > 130 || beta < -130) isTiltingUp = true; // Ceiling
+        }
+      }
+
+      // 3. Apply the Logic
       if (isCooldownRef.current) {
-        // If we are currently showing Correct/Pass, wait for phone to return to neutral
+        // Wait for phone to return to forehead to show next word
         if (isNeutral) {
           proceedToNextWord();
         }
