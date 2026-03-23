@@ -546,7 +546,7 @@ export default function App() {
             <PenSquare className="w-8 h-8 fill-[#5c5cce]" />
         </div>
         <PenSquare className={`w-6 h-6 ${gameState === 'create' ? 'opacity-0' : 'opacity-100'}`} />
-        <span className={`text-xs font-bold ${gameState === 'create' ? 'mt-6' : ''}`}>AI Deck Banayein ✨</span>
+        <span className={`text-xs font-bold ${gameState === 'create' ? 'mt-6' : ''}`}>Create an AI deck ✨</span>
       </div>
     </div>
   );
@@ -565,29 +565,29 @@ export default function App() {
               <X className="w-5 h-5" />
             </button>
 
-            <h2 className="text-3xl font-black text-[#1e2338] mb-8 uppercase tracking-wide">Kaise Khelein</h2>
+            <h2 className="text-3xl font-black text-[#1e2338] mb-8 uppercase tracking-wide">How to Play</h2>
             
             <div className="flex items-start gap-5 mb-6 w-full">
                <div className="bg-indigo-100 p-3 rounded-full shrink-0 shadow-sm"><Smartphone className="w-7 h-7 text-indigo-600" /></div>
                <div>
-                  <h4 className="font-black text-slate-800 text-lg mb-1">1. Mathe Par Rakhein</h4>
-                  <p className="text-sm text-slate-500 font-medium leading-relaxed">Phone ko apne mathe par doston ki taraf face karke rakhein taaki woh shabd dekh sakein.</p>
+                  <h4 className="font-black text-slate-800 text-lg mb-1">1. Place it on your forehead</h4>
+                  <p className="text-sm text-slate-500 font-medium leading-relaxed">Place the phone on your forehead and face your friends to let them see the word.</p>
                </div>
             </div>
 
             <div className="flex items-start gap-5 mb-6 w-full">
                <div className="bg-green-100 p-3 rounded-full shrink-0 shadow-sm"><ArrowDown className="w-7 h-7 text-green-600" /></div>
                <div>
-                  <h4 className="font-black text-slate-800 text-lg mb-1">2. Niche Jhukayein = Sahi</h4>
-                  <p className="text-sm text-slate-500 font-medium leading-relaxed">Jab aapke dost sahi jawab bata dein, toh phone aage (niche) ki taraf jhukayein.</p>
+                  <h4 className="font-black text-slate-800 text-lg mb-1">2. Tilt Down = Correct</h4>
+                  <p className="text-sm text-slate-500 font-medium leading-relaxed">When your friends guess correctly, tilt the phone forward (down).</p>
                </div>
             </div>
 
             <div className="flex items-start gap-5 mb-10 w-full">
                <div className="bg-red-100 p-3 rounded-full shrink-0 shadow-sm"><ArrowUp className="w-7 h-7 text-red-600" /></div>
                <div>
-                  <h4 className="font-black text-slate-800 text-lg mb-1">3. Upar Uthayein = Pass</h4>
-                  <p className="text-sm text-slate-500 font-medium leading-relaxed">Agar jawab nahi aata, toh agle shabd ke liye phone pichhe (upar) uthayein.</p>
+                  <h4 className="font-black text-slate-800 text-lg mb-1">3. Lift Up = Pass</h4>
+                  <p className="text-sm text-slate-500 font-medium leading-relaxed">If you don’t know the answer, lift the phone backward (up) to move to the next word.</p>
                </div>
             </div>
 
@@ -595,7 +595,7 @@ export default function App() {
               onClick={() => setGameState('home')}
               className="w-full bg-[#5c5cce] text-white font-bold text-xl py-4 rounded-2xl shadow-[0_6px_0_#4343a3] active:translate-y-1.5 active:shadow-none transition-all flex items-center justify-center gap-2"
             >
-              <Check className="w-6 h-6" /> Samajh gaya! Chalo Khelein
+              <Check className="w-6 h-6" /> Got it! Let’s play!
             </button>
          </div>
       </div>
@@ -711,7 +711,7 @@ export default function App() {
 
         {playMode === 'single' && (
           <div className="bg-white p-6 rounded-2xl shadow-sm w-full max-w-sm mb-8 animate-in fade-in zoom-in duration-300 flex flex-col items-center">
-            <div className="text-slate-500 font-bold text-center mb-2">Aapke paas guess karne ke liye 90s hain</div>
+            <div className="text-slate-500 font-bold text-center mb-2">You have 90 seconds to guess</div>
             <div className="text-2xl font-black text-[#5c5cce]">1 MOVIE</div>
           </div>
         )}
@@ -747,10 +747,10 @@ export default function App() {
           }} 
         >
           <h1 className="text-5xl md:text-7xl font-bold text-white text-center leading-snug tracking-wide">
-            Phone ko apne mathe par<br/>rakhein aur aage badhein
+            Place the phone on your forehead<br/>and proceed
           </h1>
           <p className="absolute bottom-6 text-white/50 text-sm md:text-base font-semibold">
-            (PC par detection skip karne ke liye screen tap karein)
+            (Tap the screen to skip detection on PC)
           </p>
         </div>
       </LandscapeWrapper>
@@ -784,7 +784,7 @@ export default function App() {
         <div className="flex w-full h-full relative z-10">
           <div className="w-24 md:w-32 flex justify-center items-center h-full pointer-events-none">
             <span className="-rotate-90 origin-center text-white font-bold tracking-[0.3em] text-xl whitespace-nowrap opacity-90">
-              {score} SAHI JAWAB
+              {score} Correct Answer
             </span>
           </div>
 
@@ -819,7 +819,7 @@ export default function App() {
                onClick={() => handleAnswer(false, true)}
              >
                <div className="text-white/60 font-bold text-2xl flex items-center gap-2 group-hover:text-white transition-colors">
-                  <RotateCcw className="w-6 h-6" /> PASS KARNE KE LIYE TAP KAREIN
+                  <RotateCcw className="w-6 h-6" /> Tap to Pass
                </div>
              </div>
              <div 
@@ -827,7 +827,7 @@ export default function App() {
                onClick={() => handleAnswer(true, true)}
              >
                <div className="text-white/60 font-bold text-2xl flex items-center gap-2 group-hover:text-white transition-colors">
-                  SAHI JAWAB KE LIYE TAP KAREIN <Check className="w-6 h-6" />
+                  Tap to see the correct answer! <Check className="w-6 h-6" />
                </div>
              </div>
           </div>
@@ -839,12 +839,12 @@ export default function App() {
   if (gameState === 'results') {
     return (
       <div className="flex flex-col h-screen w-full bg-[#f0f2f5] font-sans items-center justify-center p-6 text-center">
-        <h2 className="text-4xl font-black text-[#1e2338] mb-2 uppercase">Samay Samapt!</h2>
+        <h2 className="text-4xl font-black text-[#1e2338] mb-2 uppercase">Time's Up!</h2>
         <p className="text-slate-500 font-bold mb-6">Category: {selectedDeck.title} {playMode === 'single' ? '(Single Mode)' : ''}</p>
 
         <div className="bg-white p-6 rounded-3xl shadow-lg w-full max-w-sm mb-10 flex flex-col items-center">
            <div className="text-6xl mb-2">🏆</div>
-           <p className="text-slate-500 font-bold uppercase tracking-wider text-sm mb-1">Aapka Score</p>
+           <p className="text-slate-500 font-bold uppercase tracking-wider text-sm mb-1">Your Score</p>
            <h1 className="text-7xl font-black text-[#5c5cce] mb-4">{score}</h1>
            <div className="w-full bg-slate-100 rounded-full h-3 overflow-hidden mb-4">
               <div 
@@ -855,7 +855,7 @@ export default function App() {
            
            {correctWords.length > 0 && (
              <div className="w-full mt-2 border-t border-slate-100 pt-4 flex flex-col items-center">
-                <p className="text-slate-400 font-bold uppercase tracking-wider text-xs mb-3">Sahi Boojhe Gaye Shabd</p>
+                <p className="text-slate-400 font-bold uppercase tracking-wider text-xs mb-3">Correctly Guessed Words</p>
                 <div className="flex flex-wrap gap-2 justify-center max-h-32 overflow-y-auto w-full p-1 custom-scrollbar">
                    {correctWords.map((word, i) => (
                      <span key={i} className="bg-green-100 text-green-700 px-3 py-1.5 rounded-full text-sm font-bold border border-green-200 shadow-sm">
@@ -867,7 +867,7 @@ export default function App() {
            )}
 
            {correctWords.length === 0 && (
-             <p className="text-xs text-slate-400 font-semibold mt-2">Agli baar behtar koshish karein!</p>
+             <p className="text-xs text-slate-400 font-semibold mt-2">Try better next time!</p>
            )}
         </div>
 
@@ -885,7 +885,7 @@ export default function App() {
             onClick={() => setGameState('setup')}
             className="flex-1 bg-[#5c5cce] text-white font-bold text-lg py-4 rounded-2xl shadow-[0_4px_0_#4343a3] active:translate-y-1 active:shadow-none transition-all flex justify-center items-center gap-2"
           >
-            <RotateCcw className="w-5 h-5" /> Phir Se Khelein
+            <RotateCcw className="w-5 h-5" /> Play Again
           </button>
         </div>
       </div>
@@ -906,9 +906,9 @@ export default function App() {
               <Sparkles className="text-indigo-600 w-10 h-10" />
             </div>
             
-            <h2 className="text-2xl font-black text-slate-800 mb-2 relative z-10 text-center">AI Deck Banayein</h2>
+            <h2 className="text-2xl font-black text-slate-800 mb-2 relative z-10 text-center">Create AI Deck</h2>
             <p className="text-slate-500 text-center text-sm font-medium mb-8 relative z-10">
-              Koi bhi majedar topic type karein aur AI aapke liye deck banayega!
+              Type any fun topic, and the AI will create a deck for you!
             </p>
 
             <input 
@@ -929,12 +929,12 @@ export default function App() {
               {isGenerating ? (
                 <>
                   <Loader2 className="w-6 h-6 animate-spin" />
-                  Soch raha hoon...
+                  Thinking...
                 </>
               ) : (
                 <>
                   <Sparkles className="w-5 h-5" />
-                  Deck Banayein ✨
+                  Create Deck ✨
                 </>
               )}
             </button>
@@ -955,7 +955,7 @@ export default function App() {
                 onClick={() => setInfoMessage('')}
                 className="bg-[#5c5cce] w-full text-white px-6 py-3 rounded-2xl font-bold shadow-[0_4px_0_#4343a3] active:translate-y-1 active:shadow-none transition-all"
               >
-                Theek Hai!
+                Alright!
               </button>
             </div>
           </div>
