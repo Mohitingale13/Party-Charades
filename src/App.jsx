@@ -9,14 +9,23 @@ const WORD_LISTS = {
     "Rajinikanth", "Akshay Kumar", "Hrithik Roshan", "Aamir Khan", "Kareena Kapoor",
     "Rohit Sharma", "Allu Arjun", "Ram Charan", "Jr NTR", "Yash", "Katrina Kaif", 
     "Anushka Sharma", "Arijit Singh", "Shreya Ghoshal", "Hardik Pandya", "Neeraj Chopra",
-    "Ayushmann Khurrana", "Vicky Kaushal", "Prabhas", "Suriya"
+    "Ayushmann Khurrana", "Vicky Kaushal", "Prabhas", "Suriya", "Ajay Devgn", "Kajol", 
+    "Madhuri Dixit", "Saif Ali Khan", "Varun Dhawan", "Tiger Shroff", "Shraddha Kapoor", 
+    "Kartik Aaryan", "Rashmika Mandanna", "Mahesh Babu", "Rajkummar Rao", "Pankaj Tripathi", 
+    "Nawazuddin Siddiqui", "Manoj Bajpayee", "Diljit Dosanjh", "Taapsee Pannu", "Vidya Balan", 
+    "AR Rahman", "Sonu Nigam", "Shaan", "Udit Narayan", "Kumar Sanu", "Alka Yagnik", 
+    "Sunidhi Chauhan", "Neha Kakkar", "Badshah", "Yo Yo Honey Singh", "Guru Randhawa"
   ],
   food: [
     "Samosa", "Dosa", "Biryani", "Vada Pav", "Pav Bhaji", "Pani Puri", "Chole Bhature", "Idli", 
     "Gulab Jamun", "Rasgulla", "Jalebi", "Palak Paneer", "Butter Chicken", "Naan", "Aloo Paratha", 
     "Dhokla", "Poha", "Misal Pav", "Bhel Puri", "Lassi", "Dal Makhani", "Kachori",
     "Rajma Chawal", "Mutter Paneer", "Kheer", "Gajar Ka Halwa", "Malai Kofta", "Momos",
-    "Soya Chaap", "Sev Puri", "Dahi Bhalla", "Aloo Tikki", "Kathi Roll", "Rabri", "Kulfi"
+    "Soya Chaap", "Sev Puri", "Dahi Bhalla", "Aloo Tikki", "Kathi Roll", "Rabri", "Kulfi",
+    "Jhalmuri", "Litti Chokha", "Thepla", "Khandvi", "Fafda", "Khakhra", "Puran Poli", 
+    "Modak", "Shrikhand", "Dal Bati Churma", "Ghevar", "Kaju Katli", "Barfi", "Rasmalai", 
+    "Chamcham", "Sandesh", "Chicken Tikka", "Seekh Kebab", "Tandoori Chicken", "Keema Pav", 
+    "Medu Vada", "Rava Dosa", "Paneer Tikka", "Gobi Manchurian", "Hakka Noodles", "Spring Roll"
   ],
   movies: [
     "Sholay", "Dangal", "3 Idiots", "Lagaan", "PK", "Dilwale Dulhania Le Jayenge", "Baahubali", 
@@ -24,21 +33,32 @@ const WORD_LISTS = {
     "Taare Zameen Par", "Chak De! India", "Bajrangi Bhaijaan", "Swades", "Andhadhun", "Drishyam", 
     "Hera Pheri", "Gully Boy", "Kahaani", "Pushpa", "KGF", "RRR", "Jawan", "Pathaan", 
     "Animal", "Kabir Singh", "Ludo", "Stree", "Bhool Bhulaiyaa", "Yeh Jawaani Hai Deewani",
-    "Om Shanti Om", "Chennai Express", "Gadar", "Border", "Welcome"
+    "Om Shanti Om", "Chennai Express", "Gadar", "Border", "Welcome", "Zanjeer", "Deewaar", 
+    "Don", "Mr India", "Maine Pyar Kiya", "Hum Aapke Hain Koun", "Kuch Kuch Hota Hai", 
+    "Dil To Pagal Hai", "Devdas", "Kal Ho Naa Ho", "Veer-Zaara", "Rang De Basanti", "Jab We Met", 
+    "My Name Is Khan", "Barfi", "Bajirao Mastani", "Padmaavat", "Sanju", "Uri", "Tanhaji", 
+    "Kantara", "Salaar", "Kalki", "Article 15", "Chhichhore", "Super 30", "Gangs of Wasseypur"
   ],
   animals: [
     "Tiger", "Elephant", "Lion", "Leopard", "Monkey", "Dog", "Cat", "Cow", "Horse", "Bear", 
     "Wolf", "Fox", "Deer", "Rabbit", "Snake", "Crocodile", "Rhinoceros", "Hippopotamus", 
     "Giraffe", "Zebra", "Cheetah", "Kangaroo", "Penguin", "Dolphin", "Whale", "Shark", 
     "Octopus", "Eagle", "Peacock", "Parrot", "Owl", "Camel", "Goat", "Sheep", "Pig",
-    "Frog", "Turtle", "Gorilla", "Panda", "Koala"
+    "Frog", "Turtle", "Gorilla", "Panda", "Koala", "Chimpanzee", "Orangutan", "Sloth", 
+    "Armadillo", "Porcupine", "Hedgehog", "Squirrel", "Raccoon", "Meerkat", "Lemur", 
+    "Hyena", "Walrus", "Seal", "Otter", "Beaver", "Moose", "Reindeer", "Bison", "Yak", 
+    "Antelope", "Gazelle", "Flamingo", "Ostrich", "Swan", "Woodpecker"
   ],
   objects: [
     "Chair", "Table", "Laptop", "Mobile Phone", "Bottle", "Pen", "Notebook", "Spectacles",
     "Watch", "Shoes", "Backpack", "Television", "Refrigerator", "Washing Machine", "Mirror",
     "Toothbrush", "Soap", "Towel", "Pillow", "Blanket", "Umbrella", "Keys", "Wallet",
     "Headphones", "Camera", "Scissors", "Comb", "Spoon", "Fork", "Plate", "Cup", 
-    "Clock", "Bicycle", "Car", "Iron", "Hairdryer", "Perfume", "Lipstick", "Ring"
+    "Clock", "Bicycle", "Car", "Iron", "Hairdryer", "Perfume", "Lipstick", "Ring",
+    "Remote", "Charger", "Earphones", "Keyboard", "Mouse", "Printer", "Suitcase", 
+    "Helmet", "Sunglasses", "Belt", "Tie", "Socks", "Gloves", "Scarf", "Necklace", 
+    "Bracelet", "Earrings", "Deodorant", "Shampoo", "Toilet Paper", "Broom", "Mop", 
+    "Dustpan", "Vacuum Cleaner"
   ],
   disney: [
     "Doraemon", "Chhota Bheem", "Shin Chan", "Tom and Jerry", "Motu Patlu", 
@@ -47,20 +67,33 @@ const WORD_LISTS = {
     "Scooby-Doo", "Mowgli", "Oswald", "Noddy", "Phineas and Ferb",
     "Roll No 21", "Little Krishna", "Bal Hanuman", "Spider-Man", "Batman",
     "Power Rangers", "Mr. Maker", "Bob the Builder", "Thomas the Tank Engine",
-    "Teletubbies", "Pink Panther", "Popeye", "Donald Duck", "Snow White"
+    "Teletubbies", "Pink Panther", "Popeye", "Donald Duck", "Snow White",
+    "Little Singham", "Gattu Battu", "Pakdam Pakdai", "Shiva", "Mighty Raju", 
+    "Winnie the Pooh", "Mulan", "Pocahontas", "Rapunzel", "Elsa", "Anna", "Olaf", 
+    "Buzz Lightyear", "Woody", "Nemo", "Dory", "Simba", "Timon", "Pumbaa", 
+    "Powerpuff Girls", "Johnny Bravo", "Dexter", "Courage the Cowardly Dog", "Ed Edd n Eddy"
   ],
   songs: [
     "Tum Hi Ho", "Chaiyya Chaiyya", "Kal Ho Naa Ho", "Kabira", "Pehla Nasha", 
     "Tujh Mein Rab Dikhta Hai", "Channa Mereya", "Desi Girl", "Kajra Re", "Jai Ho", 
     "Lungi Dance", "Munni Badnaam Hui", "Senorita", "Gerua", "Dil Diyan Gallan", 
     "Aankh Marey", "Apna Time Aayega", "Kar Gayi Chull", "Kala Chashma", "Ghungroo",
-    "Jhoome Jo Pathaan", "Kesariya", "Raabta", "Balam Pichkari", "Tum Se Hi"
+    "Jhoome Jo Pathaan", "Kesariya", "Raabta", "Balam Pichkari", "Tum Se Hi",
+    "Tujhe Dekha Toh", "Didi Tera Devar Deewana", "Mehndi Laga Ke Rakhna", "Ek Do Teen", 
+    "Choli Ke Peeche", "Bole Chudiyan", "Maahi Ve", "Beedi", "Sheila Ki Jawani", 
+    "Chikni Chameli", "Fevicol Se", "Kamli", "Afghan Jalebi", "Let's Nacho", "Bom Diggy Diggy", 
+    "O Saki Saki", "Garmi", "Nadiyon Paar", "Besharam Rang", "Chaleya", "Tere Hawaale", 
+    "Apna Bana Le", "Rasiya", "Deva Deva", "Kun Faya Kun", "Nadaan Parindey", "Sadda Haq", "Agar Tum Saath Ho"
   ],
   fruits: [
     "Apple", "Banana", "Mango", "Orange", "Grapes", "Watermelon", "Pineapple", 
     "Strawberry", "Papaya", "Guava", "Pomegranate", "Kiwi", "Cherry", "Pear", 
     "Plum", "Peach", "Lychee", "Dragonfruit", "Coconut", "Fig", "Muskmelon", 
-    "Blackberry", "Blueberry", "Avocado", "Sweet Lime"
+    "Blackberry", "Blueberry", "Avocado", "Sweet Lime", "Custard Apple", "Sapota", 
+    "Jackfruit", "Starfruit", "Passion Fruit", "Rambutan", "Mangosteen", "Durian", 
+    "Dates", "Raisins", "Apricot", "Nectarine", "Cranberry", "Raspberry", "Gooseberry", 
+    "Mulberry", "Lemon", "Lime", "Grapefruit", "Tangerine", "Clementine", "Pomelo", 
+    "Cantaloupe", "Tamarind", "Jamun"
   ]
 };
 
