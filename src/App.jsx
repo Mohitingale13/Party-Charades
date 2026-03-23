@@ -518,7 +518,7 @@ export default function App() {
       </div>
       <div 
         className="bg-white rounded-full p-1.5 cursor-pointer active:scale-95 transition-transform"
-        onClick={() => setInfoMessage('Custom decks folder jald hi aayega!')}
+        onClick={() => setInfoMessage('The custom decks folder is coming soon!')}
       >
         <FolderOpen className="text-[#5c5cce] w-5 h-5" />
       </div>
@@ -657,7 +657,7 @@ export default function App() {
                 onClick={() => setInfoMessage('')}
                 className="bg-[#5c5cce] w-full text-white px-6 py-3 rounded-2xl font-bold shadow-[0_4px_0_#4343a3] active:translate-y-1 active:shadow-none transition-all"
               >
-                Theek Hai!
+                Got it!
               </button>
             </div>
           </div>
@@ -916,7 +916,7 @@ export default function App() {
               value={customPrompt}
               onChange={(e) => setCustomPrompt(e.target.value)}
               disabled={isGenerating}
-              placeholder="Jaise: 90s Action Movies..."
+              placeholder="For eg.: 90s Action Movies..."
               className="w-full bg-slate-100 border-2 border-slate-200 rounded-xl px-4 py-4 mb-6 text-slate-800 font-bold outline-none focus:border-indigo-400 transition-colors relative z-10 placeholder:font-medium"
               onKeyDown={(e) => e.key === 'Enter' && generateCustomDeck()}
             />
