@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Ban, FolderOpen, Crown, LayoutGrid, PenSquare, Play, RotateCcw, Check, X, Sparkles, Loader2, ArrowUp, ArrowDown, HelpCircle, Smartphone } from 'lucide-react';
+import { Settings, Ban, FolderOpen, Crown, LayoutGrid, PenSquare, Play, RotateCcw, Check, X, Sparkles, Loader2, ArrowUp, ArrowDown, HelpCircle, Smartphone } from 'lucide-react';
 
-// --- DICTIONARIES ---
+// --- SHABDKOSH (DICTIONARIES) ---
 const WORD_LISTS = {
   superstars: [
     "Virat Kohli", "Shah Rukh Khan", "Salman Khan", "MS Dhoni", "Amitabh Bachchan", 
@@ -94,6 +94,55 @@ const WORD_LISTS = {
     "Dates", "Raisins", "Apricot", "Nectarine", "Cranberry", "Raspberry", "Gooseberry", 
     "Mulberry", "Lemon", "Lime", "Grapefruit", "Tangerine", "Clementine", "Pomelo", 
     "Cantaloupe", "Tamarind", "Jamun"
+  ],
+  sports: [
+    "Cricket", "Football", "Basketball", "Tennis", "Badminton", "Kabaddi", "Kho Kho", 
+    "Swimming", "Cycling", "Running", "Gym workout", "Push-ups", "Yoga", "Skipping rope", 
+    "Bowling", "Dhoni finishing shot", "Ronaldo celebration", "Catch drop 😂", "Diving save", 
+    "Umpire signal", "Boxing", "Wrestling", "Archery", "Table Tennis", "Volleyball", 
+    "Gymnastics", "Weightlifting", "Chess", "Carrom", "Ludo", "Golf", "Marathon", 
+    "Long jump", "High jump", "Pull-ups", "Planks", "Fencing", "Skating", "Karate", "Judo"
+  ],
+  actions: [
+    "Sleeping", "Eating", "Drinking", "Crying", "Laughing", "Dancing", "Singing", "Running", 
+    "Jumping", "Fighting", "Studying", "Writing exam", "Copying in exam 😂", "Scrolling phone", 
+    "Taking selfie", "Driving car", "Cooking", "Shopping", "Calling someone", "Ignoring message", 
+    "Brushing teeth", "Taking a shower", "Washing clothes", "Sweeping the floor", "Ironing clothes", 
+    "Sneezing", "Coughing", "Yawning", "Hiccuping", "Snoring", "Waving hand", "Pointing finger", 
+    "Tying shoelaces", "Combing hair", "Putting on makeup", "Shaving", "Cutting vegetables", 
+    "Reading a book", "Painting", "Typing on keyboard"
+  ],
+  memes: [
+    "Sigma male walk", "Cringe dance", "Overacting crying", "Slow-motion entry", "Kya karu main mar jaun?", 
+    "Reel shooting", "Influencer pose", "Gym flex", "Angry girlfriend", "Mom scolding", 
+    "Teacher shouting", "Student sleeping in class", "Late to class panic", "Phone falling reaction", 
+    "Buffering internet", "Fake laughing", "Dramatic breakup", "Jealous friend", "Winning celebration", 
+    "Losing frustration", "Babu Rao pose", "Chacha Vidhayak Hai", "Control Uday Control", "Aurat ka chakkar", 
+    "Jal lijiye", "Paisa hi paisa hoga", "Yeh baburao ka style hai", "Khopdi tod saale ka", "O bhai maaro mujhe", 
+    "Gajab beizzati hai", "Samajh rahe ho", "Cheating cheating cheating", "Main madarchod hu", 
+    "Ganja peeke aaya hai", "Aap convince ho gaye", "Aao kabhi haveli pe", "Bulao police ko", "Humko maaro", 
+    "Shaant gadadhari bheem", "Mera toh itna life kharab ho gaya"
+  ],
+  desi: [
+    "Auto rickshaw bargaining", "Indian mom shouting", "Touching feet (namaste)", "Eating with hands", 
+    "Wedding dance", "Baraat entry", "Temple prayer", "Festival celebration", "Holi playing", 
+    "Diwali crackers", "Power cut reaction", "Water tanker fight 😂", "Standing in queue", "Train travel rush", 
+    "Street shopping", "Golgappa eating contest", "Chai pe charcha", "Window seat fight", "Pushing in bus", 
+    "Aunties gossiping", "Asking for free dhaniya", "Traffic jam horn", "Riding triple seat", "Jugaad fix", 
+    "Scolding kid in public", "Waiting for tatkal ticket", "Bargaining with sabziwala", "Chappal se pitayi", 
+    "Mummy's flying chappal", "Papa ka taana", "Relatives asking salary", "Checking result tension", 
+    "Baraat naagin dance", "Shaadi mein khana", "Gali cricket fight", "Maa ki mamta", "Dost se udhaar", 
+    "Gali ka kutta bhonkna", "Bijli ka bill dekhna", "Free wifi dhoondhna"
+  ],
+  relationships: [
+    "Proposing", "Heartbreak", "Hugging", "Fighting couple", "Ignoring partner", "Calling crush", 
+    "First date", "Blushing", "Cheating suspicion 😂", "Apologizing", "Secret texting", "Parents catching you", 
+    "Ex calling", "Jealousy looking at phone", "Romantic walk", "Hiding face", "Throwing water on face", 
+    "Slapping scene", "Packing bags to leave", "Fake crying for attention", "Surprise gift reaction", 
+    "Forgetting anniversary", "Checking phone secretly", "Begging to stay", "Eye contact", "Holding hands", 
+    "Giving flowers", "Kneeling down", "Crying in rain", "Tearing old photos", "Listening to sad songs", 
+    "Waiting for reply", "Blocked on WhatsApp", "Stalking on Instagram", "Making jealous", "Late night calls", 
+    "Forehead kiss", "Feeding each other", "Angry walking away", "Running to hug"
   ]
 };
 
@@ -103,24 +152,28 @@ const DECKS = [
   { id: 'animals', title: 'Animals', icon: '🦁', color: 'bg-teal-400' },
   { id: 'movies', title: 'Hindi Movies', icon: '🎬', color: 'bg-blue-400' },
   { id: 'songs', title: 'Hindi Songs', icon: '🎵', color: 'bg-pink-500' },
+  { id: 'actions', title: 'Actions', icon: '🏃', color: 'bg-cyan-500' },
+  { id: 'memes', title: 'Memes & Funny', icon: '😂', color: 'bg-yellow-400' },
+  { id: 'desi', title: 'Desi Life', icon: '🇮🇳', color: 'bg-orange-500' },
+  { id: 'relationships', title: 'Drama', icon: '💔', color: 'bg-rose-500' },
   { id: 'objects', title: 'Objects', icon: '🖍️', color: 'bg-purple-500' },
   { id: 'disney', title: 'Cartoons', icon: '🐭', color: 'bg-amber-400' },
   { id: 'fruits', title: 'Fruits', icon: '🍎', color: 'bg-red-400' }
 ];
 
 export default function App() {
-  const [gameState, setGameState] = useState('home'); // home, setup, waiting-forehead, countdown, playing, results, create, tutorial
+  const [gameState, setGameState] = useState('home'); 
   const [selectedDeck, setSelectedDeck] = useState(null);
   const [timeLimit, setTimeLimit] = useState(60);
-  const [playMode, setPlayMode] = useState('standard'); // 'standard' or 'single'
+  const [playMode, setPlayMode] = useState('standard'); 
   
-  // Game Play State
+  // Khel ki State
   const [timeLeft, setTimeLeft] = useState(0);
   const [currentWords, setCurrentWords] = useState([]);
   const [currentWord, setCurrentWord] = useState('');
-  const [correctWords, setCorrectWords] = useState([]); // Track exactly what was guessed
+  const [correctWords, setCorrectWords] = useState([]); 
   const [score, setScore] = useState(0);
-  const [cardStatus, setCardStatus] = useState('neutral'); // neutral, correct, pass
+  const [cardStatus, setCardStatus] = useState('neutral'); 
   const [isCooldown, setIsCooldown] = useState(false);
   const [infoMessage, setInfoMessage] = useState(''); 
   
@@ -136,10 +189,10 @@ export default function App() {
   const isCooldownRef = useRef(false); 
   const hasStartedCountdownRef = useRef(false);
   const gyroActiveRef = useRef(false); 
-  const foreheadLockRef = useRef(false); // Prevents fast triggering while swinging phone up
-  const currentWordRef = useRef(''); // Allows event listener to know the current word
+  const foreheadLockRef = useRef(false); 
+  const currentWordRef = useRef(''); 
 
-  // Detect touch capability for hiding/showing desktop tap zones
+  // Touch screen detect karein taaki PC wale buttons hide/show ho sakein
   const isTouchDevice = typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0);
 
   // --- KEEP REF UPDATED FOR GYRO LISTENER ---
@@ -172,7 +225,7 @@ export default function App() {
   // --- FOREHEAD DETECTION ---
   useEffect(() => {
     const handleForeheadDetection = (event) => {
-      // Prevent multiple triggers or triggering while the arm is swinging up (foreheadLockRef)
+      // Prevent multiple triggers
       if (gameState !== 'waiting-forehead' || hasStartedCountdownRef.current || foreheadLockRef.current) return;
       
       const tilt = event.gamma || 0;
@@ -182,7 +235,7 @@ export default function App() {
       
       // Neutral position (upright on forehead)
       if (absTilt > 50 || (absBeta > 50 && absBeta < 130)) {
-        hasStartedCountdownRef.current = true; // Lock the trigger immediately
+        hasStartedCountdownRef.current = true; 
         startCountdown();
       }
     };
@@ -196,13 +249,11 @@ export default function App() {
   // --- PERFECTLY BALANCED GYROSCOPE HANDLING ---
   useEffect(() => {
     const handleOrientation = (event) => {
-      // Check if we are in playing state AND the 1-second grace period is over
       if (gameState !== 'playing' || !gyroActiveRef.current) return;
 
       const tilt = event.gamma || 0; 
       const beta = event.beta || 0;
       
-      // Determine if the OS has auto-rotated the browser window
       let isLandscapeOS = false;
       if (typeof window.orientation !== 'undefined') {
           isLandscapeOS = Math.abs(window.orientation) === 90;
@@ -211,47 +262,35 @@ export default function App() {
       }
 
       let isNeutral = false;
-      let isTiltingDown = false; // Correct (Face to Floor)
-      let isTiltingUp = false;   // Pass (Face to Ceiling)
+      let isTiltingDown = false; // Sahi (Niche)
+      let isTiltingUp = false;   // Pass (Upar)
 
       if (isLandscapeOS) {
-          // If the OS rotated natively, 'beta' handles the up/down pitch.
-          // Neutral on forehead means beta is near 90 or -90.
           const absBeta = Math.abs(beta);
-          
-          // Symmetric 40-degree thresholds from 90 (Neutral)
           isNeutral = absBeta > 50 && absBeta < 130;
-          isTiltingUp = absBeta <= 50;    // Tilting face up towards ceiling
-          isTiltingDown = absBeta >= 130; // Tilting face down towards floor
+          isTiltingUp = absBeta <= 50;    
+          isTiltingDown = absBeta >= 130; 
       } else {
-          // If the phone is portrait-locked but held sideways.
           const absGamma = Math.abs(tilt);
           const absBeta = Math.abs(beta);
 
-          // Neutral: Gamma is near 90/-90 (phone standing on its long edge)
-          // We set the threshold precisely at 45 degrees.
           isNeutral = absGamma > 45;
 
           if (!isNeutral) {
-              // The phone has crossed the 45-degree mark (it is flat-ish).
-              // We check beta to see if the screen is facing the floor or ceiling.
               if (absBeta > 90) {
-                  isTiltingDown = true; // Face down (Floor)
+                  isTiltingDown = true; 
               } else {
-                  isTiltingUp = true;   // Face up (Ceiling)
+                  isTiltingUp = true;   
               }
           }
       }
 
-      // --- APPLY GAME LOGIC ---
+      // --- KHEL KI LOGIC ---
       if (isCooldownRef.current) {
-        // We are currently showing Correct (Green) or Pass (Red).
-        // Wait strictly for the phone to return to the neutral forehead position.
         if (isNeutral) {
           proceedToNextWord();
         }
       } else {
-        // We are waiting for an answer.
         if (isTiltingDown) {
           handleAnswer(true, false);
         } else if (isTiltingUp) {
@@ -271,11 +310,9 @@ export default function App() {
 
   // --- GAME LOGIC ---
   const requestSensorAccessAndPlay = () => {
-    // Attempt to make the browser go fullscreen
     enterFullscreen();
-    hasStartedCountdownRef.current = false; // Reset the countdown lock
+    hasStartedCountdownRef.current = false; 
     
-    // Lock the forehead detection for 1.5 seconds so swinging the arm doesn't trigger it
     foreheadLockRef.current = true;
     setTimeout(() => {
         foreheadLockRef.current = false;
@@ -287,7 +324,7 @@ export default function App() {
           if (permissionState === 'granted') {
             setGameState('waiting-forehead');
           } else {
-            alert("Tilt controls disabled. Using manual controls instead.");
+            alert("Tilt controls disable ho gaye hain. Aap manual button ka use kar sakte hain.");
             setGameState('waiting-forehead');
           }
         })
@@ -303,7 +340,7 @@ export default function App() {
     setIsGenerating(true);
     
     try {
-      const apiKey = ""; // API key is provided by the execution environment
+      const apiKey = ""; 
       const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
       
       const prompt = `Generate a list of 20 fun and recognizable charades words or short phrases for the category: "${customPrompt}". The words should be suitable for a party game. Respond ONLY with a valid JSON array of strings. Example: ["Word 1", "Word 2"]`;
@@ -343,26 +380,24 @@ export default function App() {
       }
     } catch (error) {
       console.error("Error generating deck:", error);
-      setInfoMessage("Oops! Failed to generate the AI deck. Please try again.");
+      setInfoMessage("Oops! AI deck generate karne mein problem aayi. Phir se koshish karein.");
     } finally {
       setIsGenerating(false);
     }
   };
 
   const startCountdown = () => {
-    // Clear any existing intervals to prevent overlap glitches
     if (timerRef.current) clearInterval(timerRef.current);
     hasStartedCountdownRef.current = true;
 
-    // Prepare words & reset tracking
     const currentDeckWords = WORD_LISTS[selectedDeck.id] || customWordLists[selectedDeck.id];
     let shuffled = [...currentDeckWords].sort(() => Math.random() - 0.5);
     setCurrentWords(shuffled);
     setCurrentWord(shuffled[0]);
     setScore(0);
-    setCorrectWords([]); // Clear previously guessed words
+    setCorrectWords([]); 
     setGameState('countdown');
-    setTimeLeft(3); // Quick 3 second countdown after placing on forehead
+    setTimeLeft(3); 
 
     timerRef.current = setInterval(() => {
       setTimeLeft((prev) => {
@@ -385,7 +420,6 @@ export default function App() {
     setIsCooldown(false);
     isCooldownRef.current = false;
     
-    // 1-Second Grace Period: Disable gyro tracking briefly so the player can stabilize the phone
     gyroActiveRef.current = false;
     setTimeout(() => {
         gyroActiveRef.current = true;
@@ -412,17 +446,14 @@ export default function App() {
     
     if (isCorrect) {
       setScore(s => s + 1);
-      // Track the correct word directly from the ref to avoid stale state closures
       setCorrectWords(prev => [...prev, currentWordRef.current]);
     }
 
-    // Vibrate if supported
     if (window.navigator && window.navigator.vibrate) {
         window.navigator.vibrate(isCorrect ? [50, 50, 50] : 100);
     }
 
     if (isManual) {
-      // If playing manually on desktop without gyro, proceed to next word automatically
       setTimeout(() => {
         proceedToNextWord();
       }, 1000);
@@ -430,7 +461,6 @@ export default function App() {
   };
 
   const proceedToNextWord = () => {
-    // If we are in Single Movie Mode, the round ends immediately after one guess/pass
     if (playMode === 'single') {
         setTimeout(() => setGameState('results'), 100);
         return;
@@ -462,7 +492,6 @@ export default function App() {
 
   // --- UI COMPONENTS ---
 
-  // Forces Portrait screens into Landscape physically using CSS
   const LandscapeWrapper = ({ children, bgClass = "bg-[#5c5cce]" }) => (
     <div className={`fixed inset-0 ${bgClass} overflow-hidden z-50 transition-colors duration-300`}>
       <div 
@@ -489,7 +518,7 @@ export default function App() {
       </div>
       <div 
         className="bg-white rounded-full p-1.5 cursor-pointer active:scale-95 transition-transform"
-        onClick={() => setInfoMessage('Custom decks folder coming soon!')}
+        onClick={() => setInfoMessage('Custom decks folder jald hi aayega!')}
       >
         <FolderOpen className="text-[#5c5cce] w-5 h-5" />
       </div>
@@ -517,7 +546,7 @@ export default function App() {
             <PenSquare className="w-8 h-8 fill-[#5c5cce]" />
         </div>
         <PenSquare className={`w-6 h-6 ${gameState === 'create' ? 'opacity-0' : 'opacity-100'}`} />
-        <span className={`text-xs font-bold ${gameState === 'create' ? 'mt-6' : ''}`}>Create ✨</span>
+        <span className={`text-xs font-bold ${gameState === 'create' ? 'mt-6' : ''}`}>AI Deck Banayein ✨</span>
       </div>
     </div>
   );
@@ -536,29 +565,29 @@ export default function App() {
               <X className="w-5 h-5" />
             </button>
 
-            <h2 className="text-3xl font-black text-[#1e2338] mb-8 uppercase tracking-wide">How to Play</h2>
+            <h2 className="text-3xl font-black text-[#1e2338] mb-8 uppercase tracking-wide">Kaise Khelein</h2>
             
             <div className="flex items-start gap-5 mb-6 w-full">
                <div className="bg-indigo-100 p-3 rounded-full shrink-0 shadow-sm"><Smartphone className="w-7 h-7 text-indigo-600" /></div>
                <div>
-                  <h4 className="font-black text-slate-800 text-lg mb-1">1. Place on Forehead</h4>
-                  <p className="text-sm text-slate-500 font-medium leading-relaxed">Hold the phone against your forehead facing your friends so they can see the word.</p>
+                  <h4 className="font-black text-slate-800 text-lg mb-1">1. Mathe Par Rakhein</h4>
+                  <p className="text-sm text-slate-500 font-medium leading-relaxed">Phone ko apne mathe par doston ki taraf face karke rakhein taaki woh shabd dekh sakein.</p>
                </div>
             </div>
 
             <div className="flex items-start gap-5 mb-6 w-full">
                <div className="bg-green-100 p-3 rounded-full shrink-0 shadow-sm"><ArrowDown className="w-7 h-7 text-green-600" /></div>
                <div>
-                  <h4 className="font-black text-slate-800 text-lg mb-1">2. Tilt DOWN = Correct</h4>
-                  <p className="text-sm text-slate-500 font-medium leading-relaxed">When your friends help you guess the word correctly, tilt the phone downwards.</p>
+                  <h4 className="font-black text-slate-800 text-lg mb-1">2. Niche Jhukayein = Sahi</h4>
+                  <p className="text-sm text-slate-500 font-medium leading-relaxed">Jab aapke dost sahi jawab bata dein, toh phone aage (niche) ki taraf jhukayein.</p>
                </div>
             </div>
 
             <div className="flex items-start gap-5 mb-10 w-full">
                <div className="bg-red-100 p-3 rounded-full shrink-0 shadow-sm"><ArrowUp className="w-7 h-7 text-red-600" /></div>
                <div>
-                  <h4 className="font-black text-slate-800 text-lg mb-1">3. Tilt UP = Pass</h4>
-                  <p className="text-sm text-slate-500 font-medium leading-relaxed">If you're stuck and can't guess it, tilt the phone upwards to pass to the next word.</p>
+                  <h4 className="font-black text-slate-800 text-lg mb-1">3. Upar Uthayein = Pass</h4>
+                  <p className="text-sm text-slate-500 font-medium leading-relaxed">Agar jawab nahi aata, toh agle shabd ke liye phone pichhe (upar) uthayein.</p>
                </div>
             </div>
 
@@ -566,7 +595,7 @@ export default function App() {
               onClick={() => setGameState('home')}
               className="w-full bg-[#5c5cce] text-white font-bold text-xl py-4 rounded-2xl shadow-[0_6px_0_#4343a3] active:translate-y-1.5 active:shadow-none transition-all flex items-center justify-center gap-2"
             >
-              <Check className="w-6 h-6" /> Got it! Let's Play
+              <Check className="w-6 h-6" /> Samajh gaya! Chalo Khelein
             </button>
          </div>
       </div>
@@ -588,7 +617,7 @@ export default function App() {
               <div 
                 key={deck.id}
                 onClick={() => {
-                  setPlayMode('standard'); // Default to standard mode when opening a deck
+                  setPlayMode('standard'); 
                   setSelectedDeck(deck);
                   setGameState('setup');
                 }}
@@ -620,7 +649,7 @@ export default function App() {
           <div className="absolute inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm px-4">
             <div className="bg-white p-6 rounded-3xl shadow-xl flex flex-col items-center max-w-xs w-full">
               <div className="bg-amber-100 p-3 rounded-full mb-4">
-                <FolderOpen className="text-amber-500 w-8 h-8 animate-pulse" />
+                <Settings className="text-amber-500 w-8 h-8 animate-spin-slow" />
               </div>
               <h3 className="text-xl font-black text-slate-800 mb-2">Message</h3>
               <p className="text-slate-500 mb-6 text-center font-medium">{infoMessage}</p>
@@ -628,7 +657,7 @@ export default function App() {
                 onClick={() => setInfoMessage('')}
                 className="bg-[#5c5cce] w-full text-white px-6 py-3 rounded-2xl font-bold shadow-[0_4px_0_#4343a3] active:translate-y-1 active:shadow-none transition-all"
               >
-                Got it!
+                Theek Hai!
               </button>
             </div>
           </div>
@@ -652,7 +681,6 @@ export default function App() {
         </div>
         <h2 className="text-3xl font-black text-slate-800 mb-6">{selectedDeck.title}</h2>
         
-        {/* Toggle Mode Options (Only visible for Movies) */}
         {selectedDeck.id === 'movies' && (
           <div className="bg-white p-2 rounded-2xl shadow-sm w-full max-w-sm mb-4 flex gap-2">
             <button 
@@ -670,7 +698,6 @@ export default function App() {
           </div>
         )}
 
-        {/* Time Limit Controls - Only show in Standard Mode */}
         {playMode === 'standard' && (
           <div className="bg-white p-6 rounded-2xl shadow-sm w-full max-w-sm mb-8 animate-in fade-in zoom-in duration-300">
             <label className="block text-slate-600 font-bold mb-4 text-center">Round Duration (Seconds)</label>
@@ -682,10 +709,9 @@ export default function App() {
           </div>
         )}
 
-        {/* Static Time Limit Info - Only show in Single Mode */}
         {playMode === 'single' && (
           <div className="bg-white p-6 rounded-2xl shadow-sm w-full max-w-sm mb-8 animate-in fade-in zoom-in duration-300 flex flex-col items-center">
-            <div className="text-slate-500 font-bold text-center mb-2">You have 90 seconds to guess exactly</div>
+            <div className="text-slate-500 font-bold text-center mb-2">Aapke paas guess karne ke liye 90s hain</div>
             <div className="text-2xl font-black text-[#5c5cce]">1 MOVIE</div>
           </div>
         )}
@@ -721,10 +747,10 @@ export default function App() {
           }} 
         >
           <h1 className="text-5xl md:text-7xl font-bold text-white text-center leading-snug tracking-wide">
-            Place phone on forehead<br/>and continue
+            Phone ko apne mathe par<br/>rakhein aur aage badhein
           </h1>
           <p className="absolute bottom-6 text-white/50 text-sm md:text-base font-semibold">
-            (Tap screen to skip detection on PC)
+            (PC par detection skip karne ke liye screen tap karein)
           </p>
         </div>
       </LandscapeWrapper>
@@ -742,14 +768,12 @@ export default function App() {
   }
 
   if (gameState === 'playing') {
-    // Explicit, hardcoded Tailwind class names guarantee compilation.
-    let currentBgClass = 'bg-[#5c5cce]'; // Default purple
-    if (cardStatus === 'correct') currentBgClass = 'bg-green-500'; // Green
-    if (cardStatus === 'pass') currentBgClass = 'bg-red-500'; // Red
+    let currentBgClass = 'bg-[#5c5cce]'; 
+    if (cardStatus === 'correct') currentBgClass = 'bg-green-500'; 
+    if (cardStatus === 'pass') currentBgClass = 'bg-red-500'; 
 
     return (
       <LandscapeWrapper bgClass={currentBgClass}>
-        {/* Back Button (Top Right) */}
         <button 
           onClick={quitGame}
           className="absolute top-6 right-6 z-50 bg-white rounded-full p-2 active:scale-95 transition-transform"
@@ -757,18 +781,14 @@ export default function App() {
           <ArrowUp className="w-8 h-8 text-[#5c5cce]" />
         </button>
 
-        {/* Main Content Layout */}
         <div className="flex w-full h-full relative z-10">
-          {/* Left Side: Score */}
           <div className="w-24 md:w-32 flex justify-center items-center h-full pointer-events-none">
             <span className="-rotate-90 origin-center text-white font-bold tracking-[0.3em] text-xl whitespace-nowrap opacity-90">
-              {score} CORRECT
+              {score} SAHI JAWAB
             </span>
           </div>
 
-          {/* Center: Timer ABOVE Word */}
           <div className="flex-1 flex flex-col justify-center items-center h-full px-4 pointer-events-none">
-            {/* Timer Element */}
             <div className="relative w-16 h-16 md:w-20 md:h-20 flex items-center justify-center mb-6">
               <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 100 100">
                 <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="6" />
@@ -784,17 +804,14 @@ export default function App() {
               <span className="text-white text-2xl md:text-3xl font-bold relative z-10">{timeLeft}</span>
             </div>
 
-            {/* Word Element */}
             <h1 className="text-[10vh] md:text-[14vh] leading-none font-black text-white text-center drop-shadow-md break-words max-w-full uppercase">
               {currentWord}
             </h1>
           </div>
 
-          {/* Right Side Empty Space for Balance */}
           <div className="w-24 md:w-32 h-full pointer-events-none"></div>
         </div>
 
-        {/* ONLY visible if NOT on a touch device (Laptop/Desktop tap zones) */}
         {!isTouchDevice && (
           <div className="absolute inset-0 flex z-30">
              <div 
@@ -802,7 +819,7 @@ export default function App() {
                onClick={() => handleAnswer(false, true)}
              >
                <div className="text-white/60 font-bold text-2xl flex items-center gap-2 group-hover:text-white transition-colors">
-                  <RotateCcw className="w-6 h-6" /> TAP TO PASS
+                  <RotateCcw className="w-6 h-6" /> PASS KARNE KE LIYE TAP KAREIN
                </div>
              </div>
              <div 
@@ -810,7 +827,7 @@ export default function App() {
                onClick={() => handleAnswer(true, true)}
              >
                <div className="text-white/60 font-bold text-2xl flex items-center gap-2 group-hover:text-white transition-colors">
-                  TAP FOR CORRECT <Check className="w-6 h-6" />
+                  SAHI JAWAB KE LIYE TAP KAREIN <Check className="w-6 h-6" />
                </div>
              </div>
           </div>
@@ -822,12 +839,12 @@ export default function App() {
   if (gameState === 'results') {
     return (
       <div className="flex flex-col h-screen w-full bg-[#f0f2f5] font-sans items-center justify-center p-6 text-center">
-        <h2 className="text-4xl font-black text-[#1e2338] mb-2 uppercase">Time's Up!</h2>
+        <h2 className="text-4xl font-black text-[#1e2338] mb-2 uppercase">Samay Samapt!</h2>
         <p className="text-slate-500 font-bold mb-6">Category: {selectedDeck.title} {playMode === 'single' ? '(Single Mode)' : ''}</p>
 
         <div className="bg-white p-6 rounded-3xl shadow-lg w-full max-w-sm mb-10 flex flex-col items-center">
            <div className="text-6xl mb-2">🏆</div>
-           <p className="text-slate-500 font-bold uppercase tracking-wider text-sm mb-1">Final Score</p>
+           <p className="text-slate-500 font-bold uppercase tracking-wider text-sm mb-1">Aapka Score</p>
            <h1 className="text-7xl font-black text-[#5c5cce] mb-4">{score}</h1>
            <div className="w-full bg-slate-100 rounded-full h-3 overflow-hidden mb-4">
               <div 
@@ -836,10 +853,9 @@ export default function App() {
               ></div>
            </div>
            
-           {/* Summary of Correct Words */}
            {correctWords.length > 0 && (
              <div className="w-full mt-2 border-t border-slate-100 pt-4 flex flex-col items-center">
-                <p className="text-slate-400 font-bold uppercase tracking-wider text-xs mb-3">Words Guessed Correctly</p>
+                <p className="text-slate-400 font-bold uppercase tracking-wider text-xs mb-3">Sahi Boojhe Gaye Shabd</p>
                 <div className="flex flex-wrap gap-2 justify-center max-h-32 overflow-y-auto w-full p-1 custom-scrollbar">
                    {correctWords.map((word, i) => (
                      <span key={i} className="bg-green-100 text-green-700 px-3 py-1.5 rounded-full text-sm font-bold border border-green-200 shadow-sm">
@@ -851,7 +867,7 @@ export default function App() {
            )}
 
            {correctWords.length === 0 && (
-             <p className="text-xs text-slate-400 font-semibold mt-2">Better luck next time! Keep practicing.</p>
+             <p className="text-xs text-slate-400 font-semibold mt-2">Agli baar behtar koshish karein!</p>
            )}
         </div>
 
@@ -869,7 +885,7 @@ export default function App() {
             onClick={() => setGameState('setup')}
             className="flex-1 bg-[#5c5cce] text-white font-bold text-lg py-4 rounded-2xl shadow-[0_4px_0_#4343a3] active:translate-y-1 active:shadow-none transition-all flex justify-center items-center gap-2"
           >
-            <RotateCcw className="w-5 h-5" /> Play Again
+            <RotateCcw className="w-5 h-5" /> Phir Se Khelein
           </button>
         </div>
       </div>
@@ -883,7 +899,6 @@ export default function App() {
         
         <div className="flex-1 flex flex-col items-center justify-center px-6 w-full max-w-md mx-auto pb-20">
           <div className="bg-white p-8 rounded-3xl shadow-lg w-full flex flex-col items-center relative overflow-hidden">
-            {/* Background decoration */}
             <div className="absolute -top-10 -right-10 w-32 h-32 bg-indigo-50 rounded-full mix-blend-multiply blur-xl"></div>
             <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-purple-50 rounded-full mix-blend-multiply blur-xl"></div>
             
@@ -891,9 +906,9 @@ export default function App() {
               <Sparkles className="text-indigo-600 w-10 h-10" />
             </div>
             
-            <h2 className="text-2xl font-black text-slate-800 mb-2 relative z-10 text-center">AI Deck Creator</h2>
+            <h2 className="text-2xl font-black text-slate-800 mb-2 relative z-10 text-center">AI Deck Banayein</h2>
             <p className="text-slate-500 text-center text-sm font-medium mb-8 relative z-10">
-              Type any crazy topic and our AI will generate a custom deck for you instantly!
+              Koi bhi majedar topic type karein aur AI aapke liye deck banayega!
             </p>
 
             <input 
@@ -901,7 +916,7 @@ export default function App() {
               value={customPrompt}
               onChange={(e) => setCustomPrompt(e.target.value)}
               disabled={isGenerating}
-              placeholder="e.g. 90s Action Movies..."
+              placeholder="Jaise: 90s Action Movies..."
               className="w-full bg-slate-100 border-2 border-slate-200 rounded-xl px-4 py-4 mb-6 text-slate-800 font-bold outline-none focus:border-indigo-400 transition-colors relative z-10 placeholder:font-medium"
               onKeyDown={(e) => e.key === 'Enter' && generateCustomDeck()}
             />
@@ -914,12 +929,12 @@ export default function App() {
               {isGenerating ? (
                 <>
                   <Loader2 className="w-6 h-6 animate-spin" />
-                  Brainstorming...
+                  Soch raha hoon...
                 </>
               ) : (
                 <>
                   <Sparkles className="w-5 h-5" />
-                  Generate Deck ✨
+                  Deck Banayein ✨
                 </>
               )}
             </button>
@@ -932,7 +947,7 @@ export default function App() {
           <div className="absolute inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm px-4">
             <div className="bg-white p-6 rounded-3xl shadow-xl flex flex-col items-center max-w-xs w-full">
               <div className="bg-amber-100 p-3 rounded-full mb-4">
-                <FolderOpen className="text-amber-500 w-8 h-8 animate-pulse" />
+                <Settings className="text-amber-500 w-8 h-8 animate-spin-slow" />
               </div>
               <h3 className="text-xl font-black text-slate-800 mb-2">Message</h3>
               <p className="text-slate-500 mb-6 text-center font-medium">{infoMessage}</p>
@@ -940,7 +955,7 @@ export default function App() {
                 onClick={() => setInfoMessage('')}
                 className="bg-[#5c5cce] w-full text-white px-6 py-3 rounded-2xl font-bold shadow-[0_4px_0_#4343a3] active:translate-y-1 active:shadow-none transition-all"
               >
-                Got it!
+                Theek Hai!
               </button>
             </div>
           </div>
