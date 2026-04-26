@@ -162,7 +162,8 @@ const DECKS = [
 ];
 
 export default function App() {
-  const [gameState, setGameState] = useState('home'); 
+  // Start on 'tutorial' so it is the very first thing the user sees when opening the link
+  const [gameState, setGameState] = useState('tutorial'); 
   const [selectedDeck, setSelectedDeck] = useState(null);
   const [timeLimit, setTimeLimit] = useState(60);
   const [playMode, setPlayMode] = useState('standard'); 
