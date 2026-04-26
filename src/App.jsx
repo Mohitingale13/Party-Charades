@@ -86,14 +86,14 @@ const WORD_LISTS = {
     "Apna Bana Le", "Rasiya", "Deva Deva", "Kun Faya Kun", "Nadaan Parindey", "Sadda Haq", "Agar Tum Saath Ho"
   ],
   fruits: [
-    "Apple", "Banana", "Mango", "Orange", "Grapes", "Watermelon", "Pineapple", 
-    "Strawberry", "Papaya", "Guava", "Pomegranate", "Kiwi", "Cherry", "Pear", 
-    "Plum", "Peach", "Lychee", "Dragonfruit", "Coconut", "Fig", "Muskmelon", 
-    "Blackberry", "Blueberry", "Avocado", "Sweet Lime", "Custard Apple", "Sapota", 
-    "Jackfruit", "Starfruit", "Passion Fruit", "Rambutan", "Mangosteen", "Durian", 
-    "Dates", "Raisins", "Apricot", "Nectarine", "Cranberry", "Raspberry", "Gooseberry", 
-    "Mulberry", "Lemon", "Lime", "Grapefruit", "Tangerine", "Clementine", "Pomelo", 
-    "Cantaloupe", "Tamarind", "Jamun"
+    "Apple", "Banana", "Mango", "Orange", "Angoor (Grapes)", "Tarbooz (Watermelon)", "Ananas (Pineapple)", 
+    "Strawberry", "Papita (Papaya)", "Amrood (Guava)", "Anar (Pomegranate)", "Kiwi", "Cherry", "Nashpati (Pear)", 
+    "Lychee", "Dragonfruit", "Nariyal (Coconut)", "Anjeer (Fig)", "Kharbuja (Muskmelon)", 
+    "Avocado", "Mosambi (Sweet Lime)", "Sitaphal (Custard Apple)", "Chikoo", 
+    "Katahal (Jackfruit)", "Kamrakh (Starfruit)", "Khajoor (Dates)", "Kishmish (Raisins)", 
+    "Amla", "Shahtoot (Mulberry)", "Nimbu (Lemon)", "Imli (Tamarind)", "Jamun", 
+    "Ganna (Sugarcane)", "Ber", "Kacchi Kairi (Raw Mango)", "Tadgola (Ice Apple)", 
+    "Singhara (Water Chestnut)", "Nariyal Pani", "Aloo Bukhara (Plum)", "Peach"
   ],
   sports: [
     "Cricket", "Football", "Basketball", "Tennis", "Badminton", "Kabaddi", "Kho Kho", 
