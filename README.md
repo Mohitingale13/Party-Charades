@@ -4,7 +4,7 @@ A vibrant, mobile-first, interactive party game built with React and Tailwind CS
 
 Charades Party turns your smartphone into a classic guessing game! Players hold the phone against their forehead and try to guess the word on the screen based on clues from their friends. Just tilt the phone DOWN for a correct guess, or tilt UP to pass.
 
-## ✨ Features
+## Features
 
 - **Mobile-First Gyroscope Controls:** Built-in device orientation tracking perfectly calibrated for forehead-placement gameplay.
 - **Cross-Platform Support:** Invisible tap zones fallback for playing manually on laptops or devices without gyroscope sensors.
@@ -14,21 +14,21 @@ Charades Party turns your smartphone into a classic guessing game! Players hold 
 - **End-of-Round Summary:** Tracks your score and lists exactly which words you successfully guessed during the round.
 - **Immersive UI:** Beautiful, smooth, color-changing interface that forces landscape orientation dynamically.
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 - **Frontend Framework:** React (via Vite)
 - **Styling:** Tailwind CSS (v3)
 - **Icons:** lucide-react
 - **AI Integration:** Gemini 2.5 Flash API
 
-## 📋 Prerequisites
+## Prerequisites
 
 To run this project locally, ensure you have the following installed:
 
 - **Node.js:** Version 20.19.0 or higher (or >=22.12.0). Note: Older versions of Node 20 (like 20.17.0) will fail with the latest Vite builds.
 - **npm:** Node Package Manager (comes with Node.js).
 
-## 🚀 Getting Started
+## Getting Started
 
 Follow these steps to set up and run the game on your local machine:
 
@@ -57,7 +57,7 @@ Follow these steps to set up and run the game on your local machine:
 
 Open [http://localhost:5173/](http://localhost:5173/) in your browser to play on your computer.
 
-## 📲 Testing on your Mobile Phone
+## Testing on your Mobile Phone
 
 Because the game relies on gyroscope tilt controls, the best way to test it during development is on your actual smartphone.
 
