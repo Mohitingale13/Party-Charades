@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Settings, Ban, FolderOpen, Crown, LayoutGrid, Lightbulb, Send, CheckCircle2, Play, RotateCcw, Check, X, Sparkles, Loader2, ArrowUp, ArrowDown, HelpCircle, Smartphone } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Settings, FolderOpen, LayoutGrid, Lightbulb, Send, CheckCircle2, Play, RotateCcw, Check, X, Loader2, ArrowUp, ArrowDown, HelpCircle, Smartphone } from 'lucide-react';
 
 // --- SHABDKOSH (DICTIONARIES) ---
 const WORD_LISTS = {
@@ -178,11 +178,13 @@ export default function App() {
   const [isCooldown, setIsCooldown] = useState(false);
   const [infoMessage, setInfoMessage] = useState(''); 
   
-  // AI Custom Decks State
-  const [customDecks, setCustomDecks] = useState([]);
-  const [customWordLists, setCustomWordLists] = useState({});
-  const [customPrompt, setCustomPrompt] = useState('');
-  const [isGenerating, setIsGenerating] = useState(false);
+  // Deck Suggestion State
+  const [suggestionName, setSuggestionName] = useState('');
+  const [suggestionExamples, setSuggestionExamples] = useState('');
+  const [suggesterContact, setSuggesterContact] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState('');
 
   const timerRef = useRef(null);
   
@@ -568,71 +570,85 @@ export default function App() {
 
   if (gameState === 'tutorial') {
     return (
-      <div className="fixed inset-0 h-[100dvh] w-full bg-[#f0f2f5] font-sans overflow-hidden flex items-center justify-center p-3 sm:p-5 select-none z-50">
-        <div className="bg-white rounded-3xl p-5 sm:p-7 w-full max-w-sm shadow-xl flex flex-col items-center animate-in fade-in zoom-in duration-300 relative mx-auto max-h-[96dvh]">
+      <div className="fixed inset-0 h-[100dvh] w-full bg-white sm:bg-[#f0f2f5] font-sans overflow-hidden flex flex-col items-center justify-center sm:p-4 md:p-6 z-50 select-none">
+        <div className="bg-white sm:rounded-3xl sm:shadow-2xl w-full h-full sm:h-auto sm:max-h-[92dvh] max-w-lg flex flex-col justify-between p-5 sm:p-8 relative animate-in fade-in zoom-in duration-200">
           
-          <button 
-            onClick={() => setGameState('home')}
-            className="absolute top-3.5 right-3.5 text-slate-400 hover:text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-full p-1.5 transition-colors cursor-pointer"
-            aria-label="Close tutorial"
-          >
-            <X className="w-4 h-4 sm:w-5 sm:h-5" />
-          </button>
+          {/* Header */}
+          <div className="relative pt-2 sm:pt-0">
+            <button 
+              onClick={() => setGameState('home')}
+              className="absolute top-0 right-0 text-slate-400 hover:text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-full p-2 transition-colors cursor-pointer"
+              aria-label="Close tutorial"
+            >
+              <X className="w-5 h-5" />
+            </button>
 
-          <h2 className="text-2xl sm:text-3xl font-black text-[#1e2338] mb-3.5 sm:mb-5 uppercase tracking-wide text-center">
-            How to Play
-          </h2>
-          
-          <div className="w-full space-y-3 sm:space-y-4 mb-4 sm:mb-6">
-            <div className="flex items-center gap-3.5 sm:gap-4 w-full">
-              <div className="bg-indigo-100 p-2.5 rounded-full shrink-0 shadow-sm">
-                <Smartphone className="w-5 h-5 sm:w-6 sm:h-6 text-indigo-600" />
+            <h2 className="text-2xl sm:text-4xl font-black text-[#1e2338] text-center uppercase tracking-wide">
+              How to Play
+            </h2>
+            <p className="text-slate-400 text-center text-xs sm:text-sm font-semibold mt-1">
+              Follow these simple steps with your friends!
+            </p>
+          </div>
+
+          {/* 3 Steps - adapts proportionally with flex-1 and justify-evenly */}
+          <div className="flex-1 flex flex-col justify-evenly py-4 sm:py-6 w-full gap-3 sm:gap-4 my-auto">
+            {/* Step 1 */}
+            <div className="flex items-center gap-4 sm:gap-5 bg-slate-50 border border-slate-100 p-3.5 sm:p-4 rounded-2xl shadow-xs">
+              <div className="bg-indigo-100 p-3 sm:p-3.5 rounded-2xl shrink-0 shadow-sm text-indigo-600">
+                <Smartphone className="w-7 h-7 sm:w-8 sm:h-8" />
               </div>
-              <div>
-                <h4 className="font-black text-slate-800 text-sm sm:text-base leading-tight mb-0.5">
-                  1. Place it on your forehead
+              <div className="flex-1 min-w-0">
+                <h4 className="font-black text-slate-800 text-base sm:text-lg mb-0.5 leading-snug">
+                  1. Place on your forehead
                 </h4>
-                <p className="text-xs sm:text-sm text-slate-500 font-medium leading-snug">
-                  Place the phone on your forehead and face your friends to let them see the word.
+                <p className="text-xs sm:text-sm text-slate-500 font-medium leading-relaxed">
+                  Hold the phone facing friends without looking at the screen so they see the word.
                 </p>
               </div>
             </div>
 
-            <div className="flex items-center gap-3.5 sm:gap-4 w-full">
-              <div className="bg-green-100 p-2.5 rounded-full shrink-0 shadow-sm">
-                <ArrowDown className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
+            {/* Step 2 */}
+            <div className="flex items-center gap-4 sm:gap-5 bg-slate-50 border border-slate-100 p-3.5 sm:p-4 rounded-2xl shadow-xs">
+              <div className="bg-emerald-100 p-3 sm:p-3.5 rounded-2xl shrink-0 shadow-sm text-emerald-600">
+                <ArrowDown className="w-7 h-7 sm:w-8 sm:h-8" />
               </div>
-              <div>
-                <h4 className="font-black text-slate-800 text-sm sm:text-base leading-tight mb-0.5">
-                  2. Tilt Down = Correct
+              <div className="flex-1 min-w-0">
+                <h4 className="font-black text-slate-800 text-base sm:text-lg mb-0.5 leading-snug">
+                  2. Tilt Down = Correct!
                 </h4>
-                <p className="text-xs sm:text-sm text-slate-500 font-medium leading-snug">
-                  When your friends guess correctly, tilt the phone forward (down).
+                <p className="text-xs sm:text-sm text-slate-500 font-medium leading-relaxed">
+                  When your friends guess correctly, tilt the phone forward (down) for 1 point.
                 </p>
               </div>
             </div>
 
-            <div className="flex items-center gap-3.5 sm:gap-4 w-full">
-              <div className="bg-red-100 p-2.5 rounded-full shrink-0 shadow-sm">
-                <ArrowUp className="w-5 h-5 sm:w-6 sm:h-6 text-red-600" />
+            {/* Step 3 */}
+            <div className="flex items-center gap-4 sm:gap-5 bg-slate-50 border border-slate-100 p-3.5 sm:p-4 rounded-2xl shadow-xs">
+              <div className="bg-rose-100 p-3 sm:p-3.5 rounded-2xl shrink-0 shadow-sm text-rose-600">
+                <ArrowUp className="w-7 h-7 sm:w-8 sm:h-8" />
               </div>
-              <div>
-                <h4 className="font-black text-slate-800 text-sm sm:text-base leading-tight mb-0.5">
-                  3. Lift Up = Pass
+              <div className="flex-1 min-w-0">
+                <h4 className="font-black text-slate-800 text-base sm:text-lg mb-0.5 leading-snug">
+                  3. Tilt Up = Pass
                 </h4>
-                <p className="text-xs sm:text-sm text-slate-500 font-medium leading-snug">
-                  If you don’t know the answer, lift the phone backward (up) to move to the next word.
+                <p className="text-xs sm:text-sm text-slate-500 font-medium leading-relaxed">
+                  Don&apos;t know the word? Tilt the phone backward (up) to pass to the next word.
                 </p>
               </div>
             </div>
           </div>
 
-          <button 
-            onClick={() => setGameState('home')}
-            className="w-full bg-[#5c5cce] hover:bg-[#4f4fb8] text-white font-bold text-base sm:text-lg py-3 sm:py-3.5 rounded-2xl shadow-[0_5px_0_#4343a3] active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-2 cursor-pointer shrink-0"
-          >
-            <Check className="w-5 h-5 sm:w-6 sm:h-6" /> Got it! Let’s play!
-          </button>
+          {/* Action Button */}
+          <div className="w-full pt-2">
+            <button 
+              onClick={() => setGameState('home')}
+              className="w-full bg-[#5c5cce] hover:bg-[#4f4fb8] text-white font-black text-lg sm:text-xl py-3.5 sm:py-4 rounded-2xl shadow-[0_5px_0_#4343a3] active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <Check className="w-6 h-6 stroke-[3]" /> Got it! Let’s play!
+            </button>
+          </div>
+
         </div>
       </div>
     );
@@ -649,7 +665,7 @@ export default function App() {
           </h1>
           
           <div className="grid grid-cols-2 gap-4">
-            {[...DECKS, ...customDecks].map((deck) => (
+            {DECKS.map((deck) => (
               <div 
                 key={deck.id}
                 onClick={() => {
@@ -665,15 +681,9 @@ export default function App() {
                 <h3 className="text-white font-bold text-center text-lg leading-tight w-full absolute bottom-4 px-2">
                   {deck.title}
                 </h3>
-                {deck.id.startsWith('custom_') && (
-                  <div className="absolute top-2 right-2 bg-white/20 p-1 rounded-full">
-                    <Sparkles className="w-4 h-4 text-white" />
-                  </div>
-                )}
               </div>
             ))}
           </div>
-          
           <div className="mt-8 mb-4 text-center">
             <p className="text-slate-400 font-bold text-sm tracking-wide">Developed by Mohit Ingale</p>
           </div>
