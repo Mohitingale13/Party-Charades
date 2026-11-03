@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Settings, Ban, FolderOpen, Crown, LayoutGrid, PenSquare, Play, RotateCcw, Check, X, Sparkles, Loader2, ArrowUp, ArrowDown, HelpCircle, Smartphone } from 'lucide-react';
+import { Settings, Ban, FolderOpen, Crown, LayoutGrid, Lightbulb, Send, CheckCircle2, Play, RotateCcw, Check, X, Sparkles, Loader2, ArrowUp, ArrowDown, HelpCircle, Smartphone } from 'lucide-react';
 
 // --- SHABDKOSH (DICTIONARIES) ---
 const WORD_LISTS = {
@@ -335,55 +335,45 @@ export default function App() {
     }
   };
 
-  // --- AI DECK GENERATOR (GEMINI API) ---
-  const generateCustomDeck = async () => {
-    if (!customPrompt.trim()) return;
-    setIsGenerating(true);
-    
-    try {
-      const apiKey = ""; 
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
-      
-      const prompt = `Generate a list of 20 fun and recognizable charades words or short phrases for the category: "${customPrompt}". The words should be suitable for a party game. Respond ONLY with a valid JSON array of strings. Example: ["Word 1", "Word 2"]`;
+  // --- DECK SUGGESTION HANDLER (FORMSUBMIT) ---
+  const handleSuggestionSubmit = async (e) => {
+    if (e) e.preventDefault();
+    if (!suggestionName.trim() || !suggestionExamples.trim()) return;
 
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+    setIsSubmitting(true);
+    setSubmitError('');
+
+    try {
+      const response = await fetch("https://formsubmit.co/ajax/mohitpraviningale13@gmail.com", {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
         body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: {
-            responseMimeType: "application/json"
-          }
+          _subject: `New Charades Deck Suggestion: ${suggestionName.trim()}`,
+          "Deck Name": suggestionName.trim(),
+          "Example Words / Clues": suggestionExamples.trim(),
+          "Suggested By": suggesterContact.trim() || "Anonymous Player",
+          _template: "table",
+          _captcha: "false"
         })
       });
 
-      if (!response.ok) throw new Error("API Request Failed");
-
-      const data = await response.json();
-      const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-      const words = JSON.parse(text);
-
-      if (words && words.length > 0) {
-        const newDeckId = 'custom_' + Date.now();
-        const deckTitle = customPrompt.length > 15 ? customPrompt.substring(0, 15) + '...' : customPrompt;
-        
-        const newDeck = {
-          id: newDeckId,
-          title: deckTitle,
-          icon: '✨',
-          color: 'bg-indigo-500'
-        };
-
-        setCustomDecks(prev => [...prev, newDeck]);
-        setCustomWordLists(prev => ({ ...prev, [newDeckId]: words }));
-        setGameState('home');
-        setCustomPrompt('');
+      if (response.ok) {
+        setIsSubmitted(true);
+        setSuggestionName('');
+        setSuggestionExamples('');
+        setSuggesterContact('');
+      } else {
+        const data = await response.json().catch(() => null);
+        throw new Error(data?.message || "Failed to submit");
       }
-    } catch (error) {
-      console.error("Error generating deck:", error);
-      setInfoMessage("Oops! AI deck generate karne mein problem aayi. Phir se koshish karein.");
+    } catch (err) {
+      console.error("FormSubmit error:", err);
+      setSubmitError("Could not send suggestion right now. Please try again or check your internet connection.");
     } finally {
-      setIsGenerating(false);
+      setIsSubmitting(false);
     }
   };
 
@@ -391,7 +381,7 @@ export default function App() {
     if (timerRef.current) clearInterval(timerRef.current);
     hasStartedCountdownRef.current = true;
 
-    const currentDeckWords = WORD_LISTS[selectedDeck.id] || customWordLists[selectedDeck.id];
+    const currentDeckWords = WORD_LISTS[selectedDeck.id] || [];
     let shuffled = [...currentDeckWords].sort(() => Math.random() - 0.5);
     setCurrentWords(shuffled);
     setCurrentWord(shuffled[0]);
@@ -527,27 +517,49 @@ export default function App() {
   );
 
   const BottomNav = () => (
-    <div className="bg-white h-16 flex justify-around items-end pb-2 fixed bottom-0 w-full z-10 rounded-t-2xl shadow-[0_-4px_10px_rgba(0,0,0,0.05)] shrink-0">
+    <div className="bg-white h-16 flex justify-around items-center px-4 fixed bottom-0 left-0 right-0 w-full z-10 rounded-t-2xl shadow-[0_-4px_16px_rgba(0,0,0,0.06)] shrink-0 select-none">
       <div 
-        className={`flex flex-col items-center gap-1 cursor-pointer relative ${gameState === 'home' ? 'text-[#5c5cce]' : 'text-slate-400 hover:text-[#5c5cce]'}`}
+        className={`flex flex-col items-center cursor-pointer transition-all duration-200 py-1 ${
+          gameState === 'home' ? 'text-[#5c5cce]' : 'text-slate-400 hover:text-[#5c5cce]'
+        }`}
         onClick={() => setGameState('home')}
       >
-        <div className={`absolute -top-6 bg-white p-3 rounded-full shadow-sm border-t border-slate-100 ${gameState === 'home' ? 'block' : 'hidden'}`}>
-            <LayoutGrid className="w-8 h-8 fill-[#5c5cce]" />
+        <div 
+          className={`flex items-center justify-center rounded-full transition-all duration-200 ${
+            gameState === 'home' 
+              ? '-translate-y-1.5 bg-[#edeefc] text-[#5c5cce] p-2 shadow-sm border border-indigo-100 ring-2 ring-indigo-50/60' 
+              : 'translate-y-0 bg-transparent text-slate-400 p-2 hover:bg-slate-50'
+          }`}
+        >
+          <LayoutGrid className={`w-5 h-5 sm:w-6 sm:h-6 ${gameState === 'home' ? 'fill-[#5c5cce]' : ''}`} />
         </div>
-        <LayoutGrid className={`w-6 h-6 ${gameState === 'home' ? 'opacity-0' : 'opacity-100'}`} />
-        <span className={`text-xs font-bold ${gameState === 'home' ? 'mt-6' : ''}`}>Decks</span>
+        <span className={`text-[11px] sm:text-xs font-bold leading-tight transition-colors mt-0.5 ${
+          gameState === 'home' ? 'text-[#5c5cce] font-extrabold' : 'text-slate-400'
+        }`}>
+          Decks
+        </span>
       </div>
 
       <div 
-        className={`flex flex-col items-center gap-1 cursor-pointer relative ${gameState === 'create' ? 'text-[#5c5cce]' : 'text-slate-400 hover:text-[#5c5cce]'}`}
-        onClick={() => setGameState('create')}
+        className={`flex flex-col items-center cursor-pointer transition-all duration-200 py-1 ${
+          gameState === 'suggest' ? 'text-[#5c5cce]' : 'text-slate-400 hover:text-[#5c5cce]'
+        }`}
+        onClick={() => setGameState('suggest')}
       >
-        <div className={`absolute -top-6 bg-white p-3 rounded-full shadow-sm border-t border-slate-100 ${gameState === 'create' ? 'block' : 'hidden'}`}>
-            <PenSquare className="w-8 h-8 fill-[#5c5cce]" />
+        <div 
+          className={`flex items-center justify-center rounded-full transition-all duration-200 ${
+            gameState === 'suggest' 
+              ? '-translate-y-1.5 bg-[#edeefc] text-[#5c5cce] p-2 shadow-sm border border-indigo-100 ring-2 ring-indigo-50/60' 
+              : 'translate-y-0 bg-transparent text-slate-400 p-2 hover:bg-slate-50'
+          }`}
+        >
+          <Lightbulb className={`w-5 h-5 sm:w-6 sm:h-6 ${gameState === 'suggest' ? 'fill-amber-400 text-amber-500' : ''}`} />
         </div>
-        <PenSquare className={`w-6 h-6 ${gameState === 'create' ? 'opacity-0' : 'opacity-100'}`} />
-        <span className={`text-xs font-bold ${gameState === 'create' ? 'mt-6' : ''}`}>Create an AI deck ✨</span>
+        <span className={`text-[11px] sm:text-xs font-bold leading-tight transition-colors mt-0.5 ${
+          gameState === 'suggest' ? 'text-[#5c5cce] font-extrabold' : 'text-slate-400'
+        }`}>
+          Suggest a Deck 💡
+        </span>
       </div>
     </div>
   );
@@ -556,56 +568,79 @@ export default function App() {
 
   if (gameState === 'tutorial') {
     return (
-      <div className="flex flex-col h-screen w-full bg-[#f0f2f5] font-sans overflow-hidden relative p-6 items-center justify-center">
-         <div className="bg-white rounded-3xl p-8 w-full max-w-sm shadow-xl flex flex-col items-center animate-in fade-in zoom-in duration-300 relative">
-            
-            <button 
-              onClick={() => setGameState('home')}
-              className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 bg-slate-100 rounded-full p-1"
-            >
-              <X className="w-5 h-5" />
-            </button>
+      <div className="fixed inset-0 h-[100dvh] w-full bg-[#f0f2f5] font-sans overflow-hidden flex items-center justify-center p-3 sm:p-5 select-none z-50">
+        <div className="bg-white rounded-3xl p-5 sm:p-7 w-full max-w-sm shadow-xl flex flex-col items-center animate-in fade-in zoom-in duration-300 relative mx-auto max-h-[96dvh]">
+          
+          <button 
+            onClick={() => setGameState('home')}
+            className="absolute top-3.5 right-3.5 text-slate-400 hover:text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-full p-1.5 transition-colors cursor-pointer"
+            aria-label="Close tutorial"
+          >
+            <X className="w-4 h-4 sm:w-5 sm:h-5" />
+          </button>
 
-            <h2 className="text-3xl font-black text-[#1e2338] mb-8 uppercase tracking-wide">How to Play</h2>
-            
-            <div className="flex items-start gap-5 mb-6 w-full">
-               <div className="bg-indigo-100 p-3 rounded-full shrink-0 shadow-sm"><Smartphone className="w-7 h-7 text-indigo-600" /></div>
-               <div>
-                  <h4 className="font-black text-slate-800 text-lg mb-1">1. Place it on your forehead</h4>
-                  <p className="text-sm text-slate-500 font-medium leading-relaxed">Place the phone on your forehead and face your friends to let them see the word.</p>
-               </div>
+          <h2 className="text-2xl sm:text-3xl font-black text-[#1e2338] mb-3.5 sm:mb-5 uppercase tracking-wide text-center">
+            How to Play
+          </h2>
+          
+          <div className="w-full space-y-3 sm:space-y-4 mb-4 sm:mb-6">
+            <div className="flex items-center gap-3.5 sm:gap-4 w-full">
+              <div className="bg-indigo-100 p-2.5 rounded-full shrink-0 shadow-sm">
+                <Smartphone className="w-5 h-5 sm:w-6 sm:h-6 text-indigo-600" />
+              </div>
+              <div>
+                <h4 className="font-black text-slate-800 text-sm sm:text-base leading-tight mb-0.5">
+                  1. Place it on your forehead
+                </h4>
+                <p className="text-xs sm:text-sm text-slate-500 font-medium leading-snug">
+                  Place the phone on your forehead and face your friends to let them see the word.
+                </p>
+              </div>
             </div>
 
-            <div className="flex items-start gap-5 mb-6 w-full">
-               <div className="bg-green-100 p-3 rounded-full shrink-0 shadow-sm"><ArrowDown className="w-7 h-7 text-green-600" /></div>
-               <div>
-                  <h4 className="font-black text-slate-800 text-lg mb-1">2. Tilt Down = Correct</h4>
-                  <p className="text-sm text-slate-500 font-medium leading-relaxed">When your friends guess correctly, tilt the phone forward (down).</p>
-               </div>
+            <div className="flex items-center gap-3.5 sm:gap-4 w-full">
+              <div className="bg-green-100 p-2.5 rounded-full shrink-0 shadow-sm">
+                <ArrowDown className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
+              </div>
+              <div>
+                <h4 className="font-black text-slate-800 text-sm sm:text-base leading-tight mb-0.5">
+                  2. Tilt Down = Correct
+                </h4>
+                <p className="text-xs sm:text-sm text-slate-500 font-medium leading-snug">
+                  When your friends guess correctly, tilt the phone forward (down).
+                </p>
+              </div>
             </div>
 
-            <div className="flex items-start gap-5 mb-10 w-full">
-               <div className="bg-red-100 p-3 rounded-full shrink-0 shadow-sm"><ArrowUp className="w-7 h-7 text-red-600" /></div>
-               <div>
-                  <h4 className="font-black text-slate-800 text-lg mb-1">3. Lift Up = Pass</h4>
-                  <p className="text-sm text-slate-500 font-medium leading-relaxed">If you don’t know the answer, lift the phone backward (up) to move to the next word.</p>
-               </div>
+            <div className="flex items-center gap-3.5 sm:gap-4 w-full">
+              <div className="bg-red-100 p-2.5 rounded-full shrink-0 shadow-sm">
+                <ArrowUp className="w-5 h-5 sm:w-6 sm:h-6 text-red-600" />
+              </div>
+              <div>
+                <h4 className="font-black text-slate-800 text-sm sm:text-base leading-tight mb-0.5">
+                  3. Lift Up = Pass
+                </h4>
+                <p className="text-xs sm:text-sm text-slate-500 font-medium leading-snug">
+                  If you don’t know the answer, lift the phone backward (up) to move to the next word.
+                </p>
+              </div>
             </div>
+          </div>
 
-            <button 
-              onClick={() => setGameState('home')}
-              className="w-full bg-[#5c5cce] text-white font-bold text-xl py-4 rounded-2xl shadow-[0_6px_0_#4343a3] active:translate-y-1.5 active:shadow-none transition-all flex items-center justify-center gap-2"
-            >
-              <Check className="w-6 h-6" /> Got it! Let’s play!
-            </button>
-         </div>
+          <button 
+            onClick={() => setGameState('home')}
+            className="w-full bg-[#5c5cce] hover:bg-[#4f4fb8] text-white font-bold text-base sm:text-lg py-3 sm:py-3.5 rounded-2xl shadow-[0_5px_0_#4343a3] active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-2 cursor-pointer shrink-0"
+          >
+            <Check className="w-5 h-5 sm:w-6 sm:h-6" /> Got it! Let’s play!
+          </button>
+        </div>
       </div>
     );
   }
 
   if (gameState === 'home') {
     return (
-      <div className="flex flex-col h-screen w-full bg-[#f0f2f5] font-sans overflow-hidden relative">
+      <div className="flex flex-col h-[100dvh] w-full bg-[#f0f2f5] font-sans overflow-hidden relative">
         <TopBar />
         
         <div className="flex-1 overflow-y-auto pb-24 pt-4 px-4 w-full max-w-md mx-auto relative">
@@ -669,7 +704,7 @@ export default function App() {
 
   if (gameState === 'setup') {
     return (
-      <div className="flex flex-col h-screen w-full bg-[#f0f2f5] font-sans items-center justify-center p-6 relative">
+      <div className="flex flex-col h-[100dvh] w-full bg-[#f0f2f5] font-sans items-center justify-center p-6 relative">
         <button 
           onClick={() => setGameState('home')}
           className="absolute top-6 left-6 text-slate-500 bg-white p-2 rounded-full shadow-sm"
@@ -839,7 +874,7 @@ export default function App() {
 
   if (gameState === 'results') {
     return (
-      <div className="flex flex-col h-screen w-full bg-[#f0f2f5] font-sans items-center justify-center p-6 text-center">
+      <div className="flex flex-col h-[100dvh] w-full bg-[#f0f2f5] font-sans items-center justify-center p-6 text-center">
         <h2 className="text-4xl font-black text-[#1e2338] mb-2 uppercase">Time's Up!</h2>
         <p className="text-slate-500 font-bold mb-6">Category: {selectedDeck.title} {playMode === 'single' ? '(Single Mode)' : ''}</p>
 
@@ -893,52 +928,139 @@ export default function App() {
     );
   }
 
-  if (gameState === 'create') {
+  if (gameState === 'suggest') {
     return (
-      <div className="flex flex-col h-screen w-full bg-[#f0f2f5] font-sans overflow-hidden relative">
+      <div className="flex flex-col h-[100dvh] w-full bg-[#f0f2f5] font-sans overflow-hidden relative">
         <TopBar />
         
-        <div className="flex-1 flex flex-col items-center justify-center px-6 w-full max-w-md mx-auto pb-20">
-          <div className="bg-white p-8 rounded-3xl shadow-lg w-full flex flex-col items-center relative overflow-hidden">
-            <div className="absolute -top-10 -right-10 w-32 h-32 bg-indigo-50 rounded-full mix-blend-multiply blur-xl"></div>
-            <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-purple-50 rounded-full mix-blend-multiply blur-xl"></div>
-            
-            <div className="bg-indigo-100 p-4 rounded-full mb-6 relative z-10">
-              <Sparkles className="text-indigo-600 w-10 h-10" />
-            </div>
-            
-            <h2 className="text-2xl font-black text-slate-800 mb-2 relative z-10 text-center">Create AI Deck</h2>
-            <p className="text-slate-500 text-center text-sm font-medium mb-8 relative z-10">
-              Type any fun topic, and the AI will create a deck for you!
-            </p>
+        <div className="flex-1 overflow-y-auto pb-24 pt-4 px-4 w-full max-w-md mx-auto relative flex flex-col items-center justify-center">
+          <div className="bg-white p-6 sm:p-8 rounded-3xl shadow-xl w-full flex flex-col items-center relative overflow-hidden my-auto">
+            <div className="absolute -top-10 -right-10 w-32 h-32 bg-amber-50 rounded-full mix-blend-multiply blur-xl pointer-events-none"></div>
+            <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-indigo-50 rounded-full mix-blend-multiply blur-xl pointer-events-none"></div>
 
-            <input 
-              type="text" 
-              value={customPrompt}
-              onChange={(e) => setCustomPrompt(e.target.value)}
-              disabled={isGenerating}
-              placeholder="For eg.: 90s Action Movies..."
-              className="w-full bg-slate-100 border-2 border-slate-200 rounded-xl px-4 py-4 mb-6 text-slate-800 font-bold outline-none focus:border-indigo-400 transition-colors relative z-10 placeholder:font-medium"
-              onKeyDown={(e) => e.key === 'Enter' && generateCustomDeck()}
-            />
+            {isSubmitted ? (
+              <div className="flex flex-col items-center text-center py-4 relative z-10 animate-in fade-in zoom-in duration-300 w-full">
+                <div className="bg-emerald-100 p-4 rounded-full mb-4 text-emerald-600 shadow-sm">
+                  <CheckCircle2 className="w-12 h-12" />
+                </div>
+                <h2 className="text-2xl font-black text-slate-800 mb-2">Suggestion Sent! 🎉</h2>
+                <p className="text-slate-500 text-sm font-medium mb-2 leading-relaxed">
+                  Thank you! Your deck suggestion has been sent directly to Mohit (<span className="font-semibold text-slate-700">mohitpraviningale13@gmail.com</span>).
+                </p>
+                <p className="text-slate-400 text-xs mb-6 font-medium">
+                  We will review your idea and work on adding it to the game!
+                </p>
 
-            <button 
-              onClick={generateCustomDeck}
-              disabled={isGenerating || !customPrompt.trim()}
-              className="w-full bg-[#5c5cce] disabled:bg-slate-400 text-white font-bold text-lg py-4 rounded-xl shadow-[0_4px_0_#4343a3] disabled:shadow-[0_4px_0_#94a3b8] active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-2 relative z-10"
-            >
-              {isGenerating ? (
-                <>
-                  <Loader2 className="w-6 h-6 animate-spin" />
-                  Thinking...
-                </>
-              ) : (
-                <>
-                  <Sparkles className="w-5 h-5" />
-                  Create Deck ✨
-                </>
-              )}
-            </button>
+                <div className="flex flex-col sm:flex-row gap-3 w-full">
+                  <button 
+                    type="button"
+                    onClick={() => {
+                      setIsSubmitted(false);
+                      setSuggestionName('');
+                      setSuggestionExamples('');
+                      setSuggesterContact('');
+                      setSubmitError('');
+                    }}
+                    className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 px-4 rounded-xl transition-colors cursor-pointer text-sm"
+                  >
+                    Suggest Another
+                  </button>
+                  <button 
+                    type="button"
+                    onClick={() => setGameState('home')}
+                    className="flex-1 bg-[#5c5cce] hover:bg-[#4f4fb8] text-white font-bold py-3 px-4 rounded-xl shadow-[0_4px_0_#4343a3] active:translate-y-1 active:shadow-none transition-all cursor-pointer text-sm"
+                  >
+                    Back to Decks
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <form onSubmit={handleSuggestionSubmit} className="w-full relative z-10 flex flex-col">
+                <div className="flex flex-col items-center mb-5">
+                  <div className="bg-amber-100 p-3.5 rounded-full mb-3 shadow-sm text-amber-600">
+                    <Lightbulb className="w-8 h-8 fill-amber-400" />
+                  </div>
+                  <h2 className="text-2xl font-black text-slate-800 mb-1 text-center">
+                    Suggest a New Deck
+                  </h2>
+                  <p className="text-slate-500 text-center text-xs sm:text-sm font-medium leading-relaxed">
+                    Have a fun category idea? Share the deck name and some example words directly with Mohit!
+                  </p>
+                </div>
+
+                {submitError && (
+                  <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-red-600 text-xs font-semibold text-center">
+                    {submitError}
+                  </div>
+                )}
+
+                <div className="mb-3.5">
+                  <label className="block text-slate-700 text-xs font-extrabold uppercase tracking-wider mb-1.5">
+                    Deck Name / Category <span className="text-red-500">*</span>
+                  </label>
+                  <input 
+                    type="text" 
+                    value={suggestionName}
+                    onChange={(e) => setSuggestionName(e.target.value)}
+                    disabled={isSubmitting}
+                    placeholder="e.g. 90s Cartoons, Anime, TV Shows..."
+                    className="w-full bg-slate-100 border border-slate-200 rounded-xl px-3.5 py-2.5 text-slate-800 font-semibold text-sm outline-none focus:border-indigo-500 focus:bg-white transition-colors placeholder:text-slate-400 placeholder:font-normal"
+                    required
+                  />
+                </div>
+
+                <div className="mb-3.5">
+                  <label className="block text-slate-700 text-xs font-extrabold uppercase tracking-wider mb-1.5">
+                    Example Words / Prompts <span className="text-red-500">*</span>
+                  </label>
+                  <textarea 
+                    value={suggestionExamples}
+                    onChange={(e) => setSuggestionExamples(e.target.value)}
+                    disabled={isSubmitting}
+                    rows={3}
+                    placeholder="e.g. Tom and Jerry, Dexter, Courage, Popeye..."
+                    className="w-full bg-slate-100 border border-slate-200 rounded-xl px-3.5 py-2.5 text-slate-800 font-semibold text-sm outline-none focus:border-indigo-500 focus:bg-white transition-colors placeholder:text-slate-400 placeholder:font-normal resize-none"
+                    required
+                  />
+                </div>
+
+                <div className="mb-5">
+                  <label className="block text-slate-700 text-xs font-extrabold uppercase tracking-wider mb-1.5">
+                    Your Name or Contact <span className="text-slate-400 font-normal lowercase">(optional)</span>
+                  </label>
+                  <input 
+                    type="text" 
+                    value={suggesterContact}
+                    onChange={(e) => setSuggesterContact(e.target.value)}
+                    disabled={isSubmitting}
+                    placeholder="So Mohit knows who suggested it!"
+                    className="w-full bg-slate-100 border border-slate-200 rounded-xl px-3.5 py-2.5 text-slate-800 font-semibold text-sm outline-none focus:border-indigo-500 focus:bg-white transition-colors placeholder:text-slate-400 placeholder:font-normal"
+                  />
+                </div>
+
+                <button 
+                  type="submit"
+                  disabled={isSubmitting || !suggestionName.trim() || !suggestionExamples.trim()}
+                  className="w-full bg-[#5c5cce] hover:bg-[#4d4db8] disabled:bg-slate-300 disabled:shadow-none text-white font-bold text-base py-3.5 rounded-xl shadow-[0_4px_0_#4343a3] active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      <span>Sending to Mohit...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-4 h-4" />
+                      <span>Send Suggestion</span>
+                    </>
+                  )}
+                </button>
+
+                <p className="text-[11px] text-slate-400 text-center mt-3 font-medium">
+                  Sent directly via FormSubmit to mohitpraviningale13@gmail.com
+                </p>
+              </form>
+            )}
           </div>
         </div>
 
