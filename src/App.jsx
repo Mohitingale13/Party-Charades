@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Settings, FolderOpen, LayoutGrid, Lightbulb, Send, CheckCircle2, Play, RotateCcw, Check, X, Loader2, ArrowUp, ArrowDown, HelpCircle, Smartphone } from 'lucide-react';
+import { LayoutGrid, Lightbulb, Send, CheckCircle2, Play, RotateCcw, Check, X, Loader2, ArrowUp, ArrowDown, HelpCircle, Smartphone } from 'lucide-react';
 
 // --- SHABDKOSH (DICTIONARIES) ---
 const WORD_LISTS = {
@@ -176,7 +176,6 @@ export default function App() {
   const [score, setScore] = useState(0);
   const [cardStatus, setCardStatus] = useState('neutral'); 
   const [isCooldown, setIsCooldown] = useState(false);
-  const [infoMessage, setInfoMessage] = useState(''); 
   
   // Deck Suggestion State
   const [suggestionName, setSuggestionName] = useState('');
@@ -501,19 +500,12 @@ export default function App() {
 
   const TopBar = () => (
     <div className="bg-[#5c5cce] h-14 flex items-center justify-between px-4 sticky top-0 z-10 w-full shrink-0">
-      <div className="flex gap-3">
-        <div 
-          className="bg-white rounded-full p-1.5 cursor-pointer active:scale-95 transition-transform"
-          onClick={() => setGameState('tutorial')}
-        >
-          <HelpCircle className="text-[#5c5cce] w-5 h-5" />
-        </div>
-      </div>
       <div 
         className="bg-white rounded-full p-1.5 cursor-pointer active:scale-95 transition-transform"
-        onClick={() => setInfoMessage('The custom decks folder is coming soon!')}
+        onClick={() => setGameState('tutorial')}
+        title="How to Play"
       >
-        <FolderOpen className="text-[#5c5cce] w-5 h-5" />
+        <HelpCircle className="text-[#5c5cce] w-5 h-5" />
       </div>
     </div>
   );
@@ -690,24 +682,6 @@ export default function App() {
         </div>
 
         <BottomNav />
-
-        {infoMessage && (
-          <div className="absolute inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm px-4">
-            <div className="bg-white p-6 rounded-3xl shadow-xl flex flex-col items-center max-w-xs w-full">
-              <div className="bg-amber-100 p-3 rounded-full mb-4">
-                <Settings className="text-amber-500 w-8 h-8 animate-spin-slow" />
-              </div>
-              <h3 className="text-xl font-black text-slate-800 mb-2">Message</h3>
-              <p className="text-slate-500 mb-6 text-center font-medium">{infoMessage}</p>
-              <button 
-                onClick={() => setInfoMessage('')}
-                className="bg-[#5c5cce] w-full text-white px-6 py-3 rounded-2xl font-bold shadow-[0_4px_0_#4343a3] active:translate-y-1 active:shadow-none transition-all"
-              >
-                Got it!
-              </button>
-            </div>
-          </div>
-        )}
       </div>
     );
   }
@@ -1075,24 +1049,6 @@ export default function App() {
         </div>
 
         <BottomNav />
-        
-        {infoMessage && (
-          <div className="absolute inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm px-4">
-            <div className="bg-white p-6 rounded-3xl shadow-xl flex flex-col items-center max-w-xs w-full">
-              <div className="bg-amber-100 p-3 rounded-full mb-4">
-                <Settings className="text-amber-500 w-8 h-8 animate-spin-slow" />
-              </div>
-              <h3 className="text-xl font-black text-slate-800 mb-2">Message</h3>
-              <p className="text-slate-500 mb-6 text-center font-medium">{infoMessage}</p>
-              <button 
-                onClick={() => setInfoMessage('')}
-                className="bg-[#5c5cce] w-full text-white px-6 py-3 rounded-2xl font-bold shadow-[0_4px_0_#4343a3] active:translate-y-1 active:shadow-none transition-all"
-              >
-                Alright!
-              </button>
-            </div>
-          </div>
-        )}
       </div>
     );
   }
